@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.TextField?>
+<VBox alignment="CENTER" xmlns:fx="http://javafx.com/fxml" fx:controller="file.manager.PanelController">
+
+  <HBox>
+    <ComboBox fx:id="disksBox" onAction="#selecDiskAction"/>
+    <TextField fx:id="pathField" HBox.hgrow="ALWAYS" editable="FALSE"/>
+    <Button text="Вверх" onAction="#pathUpAction"/>
+  </HBox>
+  <TableView fx:id="filesTable" VBox.vgrow="ALWAYS"/>
+
+</VBox>
