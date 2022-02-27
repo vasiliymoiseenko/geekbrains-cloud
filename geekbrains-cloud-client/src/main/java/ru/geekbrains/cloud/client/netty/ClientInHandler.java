@@ -127,6 +127,7 @@ public class ClientInHandler extends ChannelInboundHandlerAdapter {
         receivedFileLength++;
         if (fileLength == receivedFileLength) {
           currentState = State.IDLE;
+          receivedFileLength = 0;
           System.out.println("File downloaded");
           out.close();
           Platform.runLater(() -> controller.getLeftPC().updateList());

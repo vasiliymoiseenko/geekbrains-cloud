@@ -124,6 +124,9 @@ public class PanelController implements Initializable {
     if (!filesTable.isFocused()) {
       return null;
     }
+    if (filesTable.getSelectionModel().getSelectedItem() == null) {
+      return null;
+    }
     return filesTable.getSelectionModel().getSelectedItem().getFileName();
   }
 

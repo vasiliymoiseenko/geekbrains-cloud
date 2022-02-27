@@ -1,5 +1,6 @@
 package ru.geekbrains.cloud.client.javafx;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -40,14 +41,21 @@ public class Controller implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources){
+    createRepositoryFolder();
     network = new Network(this);
 
     leftPC = (PanelController) clientPanel.getProperties().get("ctrl");
     rightPC = (PanelController) serverPanel.getProperties().get("ctrl");
 
     leftPC.updateList(Paths.get("client_repository"));
+  }
 
-    //rightPC.updateList(Paths.get("server_repository"));
+  private void createRepositoryFolder() {
+    File folder = new File("client_repository");
+    if (!folder.exists()) {
+      folder.mkdir();
+      System.out.println("Folder " + folder.getName() + " created");
+    }
   }
 
   public void exitAction(ActionEvent actionEvent) {
@@ -85,21 +93,18 @@ public class Controller implements Initializable {
 
   public void deleteAction(ActionEvent actionEvent) {
     PanelController leftPC = (PanelController) clientPanel.getProperties().get("ctrl");
-    PanelController rightPC = (PanelController) serverPanel.getProperties().get("ctrl");
 
-    if (leftPC.getSelectedFileName() == null && rightPC.getSelectedFileName() == null) {
+    if (leftPC.getSelectedFileName() == null) {
       Alert alert  = new Alert(AlertType.WARNING, "Ни один файл не выбран", ButtonType.OK);
       alert.showAndWait();
       return;
     }
 
-    PanelController srcPC = leftPC.getSelectedFileName() != null ? leftPC : rightPC;
-
-    Path srcPath = Paths.get(srcPC.getCurrentPath(), srcPC.getSelectedFileName());
+    Path srcPath = Paths.get(leftPC.getCurrentPath(), leftPC.getSelectedFileName());
 
     try {
       Files.deleteIfExists(srcPath);
-      srcPC.updateList();
+      leftPC.updateList();
     } catch (IOException e) {
       Alert alert  = new Alert(AlertType.WARNING, "Не удалось удалить файл", ButtonType.OK);
       alert.showAndWait();
@@ -107,7 +112,7 @@ public class Controller implements Initializable {
   }
 
 
-  public void updateFileList() {
+  public void updateFileListServer() {
     network.updateFileList();
   }
 
@@ -143,5 +148,9 @@ public class Controller implements Initializable {
     String fileName = rightPC.getSelectedFileName();
 
     network.sendDownloadRequest(fileName);
+  }
+
+  public void updateFileListClient(ActionEvent actionEvent) {
+    leftPC.updateList();
   }
 }

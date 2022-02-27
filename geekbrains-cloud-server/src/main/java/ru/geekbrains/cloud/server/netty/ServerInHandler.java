@@ -1,4 +1,4 @@
-package ru.geekbrains.cloud.server;
+package ru.geekbrains.cloud.server.netty;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;

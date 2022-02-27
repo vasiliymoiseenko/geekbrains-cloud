@@ -1,4 +1,4 @@
-package ru.geekbrains.cloud.server;
+package ru.geekbrains.cloud.server.netty;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -7,11 +7,16 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import ru.geekbrains.cloud.server.db.AuthService;
 
 public class Server {
+  private static AuthService authService = new AuthService();
 
   public void run() throws Exception {
     System.out.println("server started");
+
+    authService.start();
+
     EventLoopGroup bossGroup = new NioEventLoopGroup();
     EventLoopGroup workerGroup = new NioEventLoopGroup();
     try {

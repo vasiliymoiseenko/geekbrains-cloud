@@ -24,10 +24,12 @@
   </HBox>
 
   <HBox spacing="5">
-    <Button text="Загрузить" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#uploadAction"/>
-    <Button text="Скачать" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#downloadAction"/>
-    <Button text="Удалить" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#deleteAction"/>
-    <Button text="Обновить список" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#updateFileList"/>
+    <Button text="Загрузить на сервер" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#uploadAction"/>
+    <Button text="Удалить с клиента" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#deleteAction"/>
+    <Button text="Обновить клиент" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#updateFileListClient"/>
+    <Button text="Скачать с сервера" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#downloadAction"/>
+    <Button text="Обновить сервер" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#updateFileListServer"/>
+
     <padding>
       <Insets bottom="5" top="5" right="5" left="5"/>
     </padding>
