@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import ru.geekbrains.cloud.common.service.FileService;
 import ru.geekbrains.cloud.common.type.DataType;
 import ru.geekbrains.cloud.common.type.FileInfo;
 
@@ -44,28 +45,46 @@ public class ServerInHandler extends ChannelInboundHandlerAdapter {
         type = DataType.getDataTypeFromByte(firstByte);
         currentState = State.NAME_LENGTH;
         receivedFileLength = 0L;
-        System.out.println(type);
+        System.out.println("Data type: " + type);
       }
 
-      if (type == DataType.COMMAND) {
+      if (type == DataType.UPDATE_FILELIST) {
         sendFileList(ctx);
       }  else if (type == DataType.FILE) {
         uploadFile(ctx, buf);
+      } else if (type == DataType.DOWNLOAD) {
+
+        if (currentState == State.NAME_LENGTH) {
+          if (buf.readableBytes() >= 4) {
+            System.out.println("Downlad Request: Get filename length");
+            nextLength = buf.readInt();
+            currentState = State.NAME;
+          }
+        }
+
+        if (currentState == State.NAME) {
+          if (buf.readableBytes() >= nextLength) {
+            byte[] fileName = new byte[nextLength];
+            buf.readBytes(fileName);
+            System.out.println("Downlad Request: Filename received - " + new String(fileName, "UTF-8"));
+            Path path = Paths.get("server_repository").resolve(new String(fileName));
+            FileService.sendFile(path, ctx.channel(), null);
+            currentState = State.IDLE;
+          }
+        }
+
       }
     }
 
     if (buf.readableBytes() == 0) {
       buf.release();
     }
-
-
-
   }
 
   private void uploadFile(ChannelHandlerContext ctx, ByteBuf buf) throws IOException {
     if (currentState == State.NAME_LENGTH) {
       if (buf.readableBytes() >= 4) {
-        System.out.println("STATE: Get filename length");
+        System.out.println("Upload file: Get filename length");
         nextLength = buf.readInt();
         currentState = State.NAME;
       }
@@ -75,7 +94,7 @@ public class ServerInHandler extends ChannelInboundHandlerAdapter {
       if (buf.readableBytes() >= nextLength) {
         byte[] fileName = new byte[nextLength];
         buf.readBytes(fileName);
-        System.out.println("STATE: Filename received - _" + new String(fileName, "UTF-8"));
+        System.out.println("Upload file: Filename received - " + new String(fileName, "UTF-8"));
         Path path = Paths.get("server_repository").resolve(new String(fileName));
         out = new BufferedOutputStream(new FileOutputStream(path.toString()));
         currentState = State.FILE_LENGTH;
@@ -85,7 +104,7 @@ public class ServerInHandler extends ChannelInboundHandlerAdapter {
     if (currentState == State.FILE_LENGTH) {
       if (buf.readableBytes() >= 8) {
         fileLength = buf.readLong();
-        System.out.println("STATE: File length received - " + fileLength);
+        System.out.println("Upload file: File length received - " + fileLength);
         currentState = State.FILE;
       }
     }
@@ -96,7 +115,7 @@ public class ServerInHandler extends ChannelInboundHandlerAdapter {
         receivedFileLength++;
         if (fileLength == receivedFileLength) {
           currentState = State.IDLE;
-          System.out.println("File received");
+          System.out.println("File uploaded");
           out.close();
           sendFileList(ctx);
           break;
@@ -108,7 +127,6 @@ public class ServerInHandler extends ChannelInboundHandlerAdapter {
   private void sendFileList(ChannelHandlerContext ctx) throws IOException {
     StringBuilder listFiles = new StringBuilder();
     Files.list(Paths.get("server_repository")).map(FileInfo::new).forEach(p -> listFiles.append(p).append("::"));
-    System.out.println(listFiles);
 
     ByteBuf outBuff = null;
     outBuff = ByteBufAllocator.DEFAULT.directBuffer(1);
@@ -123,6 +141,8 @@ public class ServerInHandler extends ChannelInboundHandlerAdapter {
     outBuff = ByteBufAllocator.DEFAULT.directBuffer(fileListBytes.length);
     outBuff.writeBytes(fileListBytes);
     ctx.writeAndFlush(outBuff);
+
+    System.out.println("FileList sended to client");
 
     currentState = State.IDLE;
     type = DataType.EMPTY;

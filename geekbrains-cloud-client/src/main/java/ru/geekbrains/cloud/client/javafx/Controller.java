@@ -34,6 +34,10 @@ public class Controller implements Initializable {
     return rightPC;
   }
 
+  public PanelController getLeftPC() {
+    return leftPC;
+  }
+
   @Override
   public void initialize(URL location, ResourceBundle resources){
     network = new Network(this);
@@ -117,12 +121,27 @@ public class Controller implements Initializable {
     Path path = Paths.get(leftPC.getCurrentPath()).resolve(leftPC.getSelectedFileName());
     System.out.println(path);
     FileService.sendFile(path, network.getChannel(), future -> {
+      //Alert alert = new Alert(AlertType.INFORMATION, "Файл загружается. Это займет какое-то время", ButtonType.OK);
+      //alert.showAndWait();
       if (!future.isSuccess()) {
         future.cause().printStackTrace();
       }
       if (future.isSuccess()) {
+        //alert.close();
         System.out.println("Файл успешно передан");
       }
     });
+  }
+
+  public void downloadAction(ActionEvent actionEvent) {
+    if (rightPC.getSelectedFileName() == null){
+      Alert alert  = new Alert(AlertType.WARNING, "Файл не выбран", ButtonType.OK);
+      alert.showAndWait();
+      return;
+    }
+
+    String fileName = rightPC.getSelectedFileName();
+
+    network.sendDownloadRequest(fileName);
   }
 }

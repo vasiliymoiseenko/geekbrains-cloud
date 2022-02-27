@@ -10,6 +10,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import java.nio.charset.StandardCharsets;
 import ru.geekbrains.cloud.client.javafx.Controller;
 
 public class Network {
@@ -51,6 +52,15 @@ public class Network {
   public void updateFileList() {
     ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1);
     buf.writeByte((byte) 16);
+    channel.writeAndFlush(buf);
+  }
+
+  public void sendDownloadRequest(String fileName) {
+    byte[] fileNameBytes = fileName.getBytes(StandardCharsets.UTF_8);
+    ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1 + 4 + fileNameBytes.length);
+    buf.writeByte((byte) 4);
+    buf.writeInt(fileNameBytes.length);
+    buf.writeBytes(fileNameBytes);
     channel.writeAndFlush(buf);
   }
 }
