@@ -106,6 +106,18 @@ public class PanelController implements Initializable {
     }
   }
 
+  public void updateList() {
+    try {
+      filesTable.getItems().clear();
+      filesTable.getItems().addAll(Files.list(Paths.get(pathField.getText())).map(FileInfo::new).collect(Collectors.toList()));
+      filesTable.sort();
+    } catch (IOException e) {
+      e.printStackTrace();
+      Alert alert = new Alert(AlertType.WARNING, "Не удалось обновить список файлов", ButtonType.OK);
+      alert.showAndWait();
+    }
+  }
+
   public void pathUpAction(ActionEvent event) {
     Path upperPath = Paths.get(pathField.getText()).getParent();
     if (upperPath != null) {

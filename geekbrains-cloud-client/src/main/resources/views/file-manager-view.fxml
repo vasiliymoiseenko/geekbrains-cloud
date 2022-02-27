@@ -24,9 +24,9 @@
   </HBox>
 
   <HBox spacing="5">
-    <Button text="Скачать" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#copyAction"/>
-    <Button text="Загрузить" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-    <Button text="Удалить" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+    <Button text="Копировать" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#copyAction"/>
+    <Button text="Переместить" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+    <Button text="Удалить" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#deleteAction"/>
     <Button text="Переименовать" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
     <padding>
       <Insets bottom="5" top="5" right="5" left="5"/>
