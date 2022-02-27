@@ -1,8 +1,7 @@
-package file.manager;
+package ru.geekbrains.cloud.client;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -11,26 +10,23 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import ru.geekbrains.cloud.common.FileInfo;
 
 public class PanelController implements Initializable {
 
   @FXML
   TextField pathField;
-  @FXML
-  ComboBox<String> disksBox;
   @FXML
   TableView<FileInfo> filesTable;
 
@@ -55,7 +51,7 @@ public class PanelController implements Initializable {
           setText("");
           setStyle("");
         } else {
-          String text = String.format("%,d", item);
+          String text = String.format("%,d b", item);
           if (item == -1L) {
             text = "";
           }
@@ -72,12 +68,6 @@ public class PanelController implements Initializable {
     filesTable.getColumns().addAll(fileTypeColumn, fileNameColumn, fileSizeColumn, fileDateColumn);
     filesTable.getSortOrder().add(fileTypeColumn);
 
-    disksBox.getItems().clear();
-    for (Path p: FileSystems.getDefault().getRootDirectories()) {
-      disksBox.getItems().add(p.toString());
-    }
-    disksBox.getSelectionModel().select(0);
-
     filesTable.setOnMouseClicked(new EventHandler<MouseEvent>() {
       @Override
       public void handle(MouseEvent event) {
@@ -89,8 +79,6 @@ public class PanelController implements Initializable {
         }
       }
     });
-
-    updateList(Paths.get("."));
   }
 
   public void updateList(Path path) {
@@ -118,17 +106,12 @@ public class PanelController implements Initializable {
     }
   }
 
-  public void pathUpAction(ActionEvent event) {
+/*  public void pathUpAction(ActionEvent event) {
     Path upperPath = Paths.get(pathField.getText()).getParent();
     if (upperPath != null) {
       updateList(upperPath);
     }
-  }
-
-  public void selecDiskAction(ActionEvent event) {
-    ComboBox<String> element = (ComboBox<String>) event.getSource();
-    updateList(Paths.get(element.getSelectionModel().getSelectedItem()));
-  }
+  }*/
 
   public String getSelectedFileName() {
     if (!filesTable.isFocused()) {

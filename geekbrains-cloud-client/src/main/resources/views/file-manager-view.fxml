@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.TextField?>
-<VBox alignment="CENTER" xmlns:fx="http://javafx.com/fxml" fx:controller="file.manager.Controller">
+<VBox alignment="CENTER" xmlns:fx="http://javafx.com/fxml" fx:controller="ru.geekbrains.cloud.client.Controller">
   <MenuBar>
     <Menu text="Файл">
       <MenuItem text="Выйти из программы" onAction="#exitAction"/>
@@ -27,7 +27,7 @@
     <Button text="Копировать" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#copyAction"/>
     <Button text="Переместить" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
     <Button text="Удалить" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#deleteAction"/>
-    <Button text="Переименовать" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+    <Button text="Обновить список" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#updateFileList"/>
     <padding>
       <Insets bottom="5" top="5" right="5" left="5"/>
     </padding>

@@ -9,16 +9,8 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>ru.geekbrains.cloud.client</groupId>
-  <artifactId>geekbrains-cloud-client</artifactId>
-  <dependencies>
-    <dependency>
-      <groupId>ru.geekbrains.cloud.common</groupId>
-      <artifactId>geekbrains-cloud-common</artifactId>
-      <version>1.0-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency>
-  </dependencies>
+  <groupId>ru.geekbrains.cloud.common</groupId>
+  <artifactId>geekbrains-cloud-common</artifactId>
 
   <properties>
     <maven.compiler.source>8</maven.compiler.source>

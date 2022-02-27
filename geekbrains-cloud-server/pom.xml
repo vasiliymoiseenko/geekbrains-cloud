@@ -11,6 +11,14 @@
 
   <groupId>ru.geekbrains.cloud.server</groupId>
   <artifactId>geekbrains-cloud-server</artifactId>
+  <dependencies>
+    <dependency>
+      <groupId>ru.geekbrains.cloud.common</groupId>
+      <artifactId>geekbrains-cloud-common</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
 
   <properties>
     <maven.compiler.source>8</maven.compiler.source>

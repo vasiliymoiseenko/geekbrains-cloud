@@ -1,33 +1,50 @@
-package file.manager;
+package ru.geekbrains.cloud.client;
 
 import java.io.IOException;
-import java.nio.file.CopyOption;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.VBox;
 
-public class Controller {
+public class Controller implements Initializable {
 
   @FXML
   VBox clientPanel;
   @FXML
   VBox serverPanel;
 
+  PanelController leftPC;
+  PanelController rightPC;
+
+  Network network;
+
+  @Override
+  public void initialize(URL location, ResourceBundle resources){
+    network = new Network();
+
+    leftPC = (PanelController) clientPanel.getProperties().get("ctrl");
+    rightPC = (PanelController) serverPanel.getProperties().get("ctrl");
+
+    leftPC.updateList(Paths.get("client_repository"));
+    rightPC.updateList(Paths.get("server_repository"));
+  }
+
   public void exitAction(ActionEvent actionEvent) {
     Platform.exit();
   }
 
   public void copyAction(ActionEvent actionEvent) {
-    PanelController leftPC = (PanelController) clientPanel.getProperties().get("ctrl");
-    PanelController rightPC = (PanelController) serverPanel.getProperties().get("ctrl");
+
 
     if (leftPC.getSelectedFileName() == null && rightPC.getSelectedFileName() == null) {
       Alert alert  = new Alert(AlertType.WARNING, "Ни один файл не выбран", ButtonType.OK);
@@ -77,5 +94,10 @@ public class Controller {
       Alert alert  = new Alert(AlertType.WARNING, "Не удалось удалить файл", ButtonType.OK);
       alert.showAndWait();
     }
+  }
+
+
+  public void updateFileList(ActionEvent actionEvent) {
+    network.updateFileList();
   }
 }

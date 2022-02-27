@@ -1,4 +1,4 @@
-package file.manager;
+package ru.geekbrains.cloud.common;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -52,5 +52,10 @@ public class FileInfo {
 
   public LocalDateTime getLastModified() {
     return lastModified;
+  }
+
+  @Override
+  public String toString() {
+    return fileName + '$' + type + '$' + size + '$' + lastModified;
   }
 }

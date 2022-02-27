@@ -12,12 +12,11 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.TextField?>
-<VBox alignment="CENTER" xmlns:fx="http://javafx.com/fxml" fx:controller="file.manager.PanelController">
+<VBox alignment="CENTER" xmlns:fx="http://javafx.com/fxml" fx:controller="ru.geekbrains.cloud.client.PanelController">
 
   <HBox>
-    <ComboBox fx:id="disksBox" onAction="#selecDiskAction"/>
     <TextField fx:id="pathField" HBox.hgrow="ALWAYS" editable="FALSE"/>
-    <Button text="Вверх" onAction="#pathUpAction"/>
+    <!--<Button text="Вверх" onAction="#pathUpAction"/>-->
   </HBox>
   <TableView fx:id="filesTable" VBox.vgrow="ALWAYS"/>
 
