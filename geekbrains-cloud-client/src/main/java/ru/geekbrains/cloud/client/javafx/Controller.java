@@ -30,7 +30,6 @@ public class Controller implements Initializable {
   PanelController rightPC;
   Network network;
 
-
   public PanelController getRightPC() {
     return rightPC;
   }
