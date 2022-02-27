@@ -1,24 +1,23 @@
-package ru.geekbrains.cloud.client;
+package ru.geekbrains.cloud.client.netty;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import java.net.InetSocketAddress;
-import java.util.concurrent.CountDownLatch;
+import ru.geekbrains.cloud.client.javafx.Controller;
 
 public class Network {
 
   private SocketChannel channel;
+  private Controller controller;
 
-  public Network() {
+  public Network(Controller controller) {
+    this.controller = controller;
     new Thread(() -> {
       EventLoopGroup workerGroup = new NioEventLoopGroup();
 
@@ -28,8 +27,9 @@ public class Network {
             .channel(NioSocketChannel.class)
             .handler(new ChannelInitializer<SocketChannel>() {
               @Override
-              protected void initChannel(SocketChannel ch) throws Exception {
-                channel = ch;
+              protected void initChannel(SocketChannel socketChannel) throws Exception {
+                socketChannel.pipeline().addLast(new ClientInHandler(controller));
+                channel = socketChannel;
               }
             });
         ChannelFuture f = b.connect("localhost", 45001).sync();
@@ -44,7 +44,7 @@ public class Network {
 
   public void updateFileList() {
     ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1);
-    buf.writeByte((byte) 2);
+    buf.writeByte((byte) 16);
     channel.writeAndFlush(buf);
   }
 }

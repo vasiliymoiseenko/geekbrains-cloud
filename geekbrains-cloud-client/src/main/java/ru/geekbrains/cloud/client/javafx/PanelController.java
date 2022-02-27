@@ -1,4 +1,4 @@
-package ru.geekbrains.cloud.client;
+package ru.geekbrains.cloud.client.javafx;
 
 import java.io.IOException;
 import java.net.URL;
@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javafx.beans.property.SimpleObjectProperty;
@@ -104,6 +105,12 @@ public class PanelController implements Initializable {
       Alert alert = new Alert(AlertType.WARNING, "Не удалось обновить список файлов", ButtonType.OK);
       alert.showAndWait();
     }
+  }
+
+  public void updateList(List<FileInfo> list) {
+    filesTable.getItems().clear();
+    filesTable.getItems().addAll(list);
+    filesTable.sort();
   }
 
 /*  public void pathUpAction(ActionEvent event) {

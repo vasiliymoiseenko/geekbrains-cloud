@@ -1,7 +1,6 @@
-package ru.geekbrains.cloud.client;
+package ru.geekbrains.cloud.client.javafx;
 
 import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

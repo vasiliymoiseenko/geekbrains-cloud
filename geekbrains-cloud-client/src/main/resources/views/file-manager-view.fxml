@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.TextField?>
-<VBox alignment="CENTER" xmlns:fx="http://javafx.com/fxml" fx:controller="ru.geekbrains.cloud.client.Controller">
+<VBox alignment="CENTER" xmlns:fx="http://javafx.com/fxml" fx:controller="ru.geekbrains.cloud.client.javafx.Controller">
   <MenuBar>
     <Menu text="Файл">
       <MenuItem text="Выйти из программы" onAction="#exitAction"/>

@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.TextField?>
-<VBox alignment="CENTER" xmlns:fx="http://javafx.com/fxml" fx:controller="ru.geekbrains.cloud.client.PanelController">
+<VBox alignment="CENTER" xmlns:fx="http://javafx.com/fxml" fx:controller="ru.geekbrains.cloud.client.javafx.PanelController">
 
   <HBox>
     <TextField fx:id="pathField" HBox.hgrow="ALWAYS" editable="FALSE"/>

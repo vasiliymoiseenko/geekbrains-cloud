@@ -1,4 +1,4 @@
-package ru.geekbrains.cloud.client;
+package ru.geekbrains.cloud.client.javafx;
 
 import java.io.IOException;
 import java.net.URL;
@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -15,6 +16,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.VBox;
+import ru.geekbrains.cloud.client.netty.Network;
+import ru.geekbrains.cloud.common.FileInfo;
 
 public class Controller implements Initializable {
 
@@ -25,12 +28,16 @@ public class Controller implements Initializable {
 
   PanelController leftPC;
   PanelController rightPC;
-
   Network network;
+
+
+  public PanelController getRightPC() {
+    return rightPC;
+  }
 
   @Override
   public void initialize(URL location, ResourceBundle resources){
-    network = new Network();
+    network = new Network(this);
 
     leftPC = (PanelController) clientPanel.getProperties().get("ctrl");
     rightPC = (PanelController) serverPanel.getProperties().get("ctrl");

@@ -20,6 +20,16 @@ public class FileInfo {
     FileType(String name) {
       this.name = name;
     }
+
+    public static FileType getTypeByString(String string) {
+      if (string.equals("FILE")) {
+        return FILE;
+      }
+      if (string.equals("DIRECTORY")) {
+        return DIRECTORY;
+      }
+      return null;
+    }
   }
 
   private String fileName;
@@ -36,6 +46,13 @@ public class FileInfo {
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  public FileInfo(String fileName, String type, long size, LocalDateTime lastModified) {
+    this.fileName = fileName;
+    this.type = FileType.getTypeByString(type);
+    this.size = size;
+    this.lastModified = lastModified;
   }
 
   public String getFileName() {

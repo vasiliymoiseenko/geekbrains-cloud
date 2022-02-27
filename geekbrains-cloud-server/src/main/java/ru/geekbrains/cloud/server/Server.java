@@ -19,13 +19,9 @@ public class Server {
       b.group(bossGroup, workerGroup)
           .channel(NioServerSocketChannel.class)
           .childHandler(new ChannelInitializer<SocketChannel>() {
-
             @Override
             protected void initChannel(SocketChannel socketChannel) throws Exception {
-              socketChannel.pipeline().addLast(
-                  new StringToByteBuffHandler(),
-                  new FileListHandler(),
-                  new FileHandler());
+              socketChannel.pipeline().addLast(new ServerInHandler());
             }
           });
       ChannelFuture f = b.bind(45001).sync();
