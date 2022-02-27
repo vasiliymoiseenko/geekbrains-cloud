@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.List;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -17,7 +16,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.VBox;
 import ru.geekbrains.cloud.client.netty.Network;
-import ru.geekbrains.cloud.common.FileInfo;
+import ru.geekbrains.cloud.common.service.FileService;
 
 public class Controller implements Initializable {
 
@@ -43,7 +42,8 @@ public class Controller implements Initializable {
     rightPC = (PanelController) serverPanel.getProperties().get("ctrl");
 
     leftPC.updateList(Paths.get("client_repository"));
-    rightPC.updateList(Paths.get("server_repository"));
+
+    //rightPC.updateList(Paths.get("server_repository"));
   }
 
   public void exitAction(ActionEvent actionEvent) {
@@ -51,7 +51,6 @@ public class Controller implements Initializable {
   }
 
   public void copyAction(ActionEvent actionEvent) {
-
 
     if (leftPC.getSelectedFileName() == null && rightPC.getSelectedFileName() == null) {
       Alert alert  = new Alert(AlertType.WARNING, "Ни один файл не выбран", ButtonType.OK);
@@ -104,7 +103,26 @@ public class Controller implements Initializable {
   }
 
 
-  public void updateFileList(ActionEvent actionEvent) {
+  public void updateFileList() {
     network.updateFileList();
+  }
+
+  public void uploadAction(ActionEvent actionEvent) throws IOException{
+    if (leftPC.getSelectedFileName() == null) {
+      Alert alert  = new Alert(AlertType.WARNING, "Файл не выбран", ButtonType.OK);
+      alert.showAndWait();
+      return;
+    }
+
+    Path path = Paths.get(leftPC.getCurrentPath()).resolve(leftPC.getSelectedFileName());
+    System.out.println(path);
+    FileService.sendFile(path, network.getChannel(), future -> {
+      if (!future.isSuccess()) {
+        future.cause().printStackTrace();
+      }
+      if (future.isSuccess()) {
+        System.out.println("Файл успешно передан");
+      }
+    });
   }
 }

@@ -22,7 +22,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import ru.geekbrains.cloud.common.FileInfo;
+import ru.geekbrains.cloud.common.type.FileInfo;
 
 public class PanelController implements Initializable {
 

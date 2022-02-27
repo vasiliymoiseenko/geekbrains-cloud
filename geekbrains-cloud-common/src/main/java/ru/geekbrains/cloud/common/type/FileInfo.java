@@ -1,4 +1,4 @@
-package ru.geekbrains.cloud.common;
+package ru.geekbrains.cloud.common.type;
 
 import java.io.IOException;
 import java.nio.file.Files;

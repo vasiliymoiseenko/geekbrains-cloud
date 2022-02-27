@@ -1,20 +1,15 @@
 package ru.geekbrains.cloud.client.netty;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import ru.geekbrains.cloud.client.javafx.Controller;
-import ru.geekbrains.cloud.common.DataType;
-import ru.geekbrains.cloud.common.FileInfo;
+import ru.geekbrains.cloud.common.type.DataType;
+import ru.geekbrains.cloud.common.type.FileInfo;
 
 public class ClientInHandler extends ChannelInboundHandlerAdapter {
 

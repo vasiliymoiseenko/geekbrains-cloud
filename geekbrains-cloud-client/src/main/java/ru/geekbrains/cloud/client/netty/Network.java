@@ -3,6 +3,7 @@ package ru.geekbrains.cloud.client.netty;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
@@ -13,7 +14,7 @@ import ru.geekbrains.cloud.client.javafx.Controller;
 
 public class Network {
 
-  private SocketChannel channel;
+  private Channel channel;
   private Controller controller;
 
   public Network(Controller controller) {
@@ -33,6 +34,7 @@ public class Network {
               }
             });
         ChannelFuture f = b.connect("localhost", 45001).sync();
+        updateFileList();
         f.channel().closeFuture().sync();
       } catch (Exception e) {
         e.printStackTrace();
@@ -40,6 +42,10 @@ public class Network {
         workerGroup.shutdownGracefully();
       }
     }).start();
+  }
+
+  public Channel getChannel() {
+    return channel;
   }
 
   public void updateFileList() {

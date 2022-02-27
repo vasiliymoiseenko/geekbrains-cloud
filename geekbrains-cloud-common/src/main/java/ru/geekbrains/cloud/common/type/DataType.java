@@ -1,4 +1,4 @@
-package ru.geekbrains.cloud.common;
+package ru.geekbrains.cloud.common.type;
 
 public enum DataType {
   EMPTY((byte)-1), FILE((byte)15), COMMAND((byte)16);
