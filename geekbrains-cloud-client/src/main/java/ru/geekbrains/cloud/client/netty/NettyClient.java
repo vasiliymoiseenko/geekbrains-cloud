@@ -10,15 +10,23 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.serialization.ClassResolvers;
+import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
 import java.nio.charset.StandardCharsets;
 import ru.geekbrains.cloud.client.javafx.Controller;
+import ru.geekbrains.cloud.common.messages.ListRequest;
 
-public class Network {
+public class NettyClient {
+
+  private static final int MAXIMUM_OBJECT_SIZE = 1024 * 1024 * 10;
+
+  private volatile ChannelFuture channelFuture;
 
   private Channel channel;
   private Controller controller;
 
-  public Network(Controller controller) {
+  public NettyClient(Controller controller) {
     this.controller = controller;
     new Thread(() -> {
       EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -30,13 +38,16 @@ public class Network {
             .handler(new ChannelInitializer<SocketChannel>() {
               @Override
               protected void initChannel(SocketChannel socketChannel) throws Exception {
-                socketChannel.pipeline().addLast(new ClientInHandler(controller));
+                socketChannel.pipeline().addLast(
+                    new ObjectDecoder(MAXIMUM_OBJECT_SIZE, ClassResolvers.cacheDisabled(null)),
+                    new ObjectEncoder(),
+                    new NettyClientHandler(controller));
                 channel = socketChannel;
               }
             });
-        ChannelFuture f = b.connect("localhost", 45001).sync();
+        channelFuture = b.connect("localhost", 45001).sync();
         updateFileList();
-        f.channel().closeFuture().sync();
+        channelFuture.channel().closeFuture().sync();
       } catch (Exception e) {
         e.printStackTrace();
       } finally {
@@ -50,17 +61,10 @@ public class Network {
   }
 
   public void updateFileList() {
-    ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1);
-    buf.writeByte((byte) 16);
-    channel.writeAndFlush(buf);
+    channel.writeAndFlush(new ListRequest());
   }
 
   public void sendDownloadRequest(String fileName) {
-    byte[] fileNameBytes = fileName.getBytes(StandardCharsets.UTF_8);
-    ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1 + 4 + fileNameBytes.length);
-    buf.writeByte((byte) 4);
-    buf.writeInt(fileNameBytes.length);
-    buf.writeBytes(fileNameBytes);
-    channel.writeAndFlush(buf);
+    //channel.writeAndFlush(buf);
   }
 }

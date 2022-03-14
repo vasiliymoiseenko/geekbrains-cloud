@@ -12,4 +12,8 @@ public class AuthService {
       System.out.println("Folder " + folder.getName() + " created");
     }
   }
+
+  public void stop() {
+    System.out.println("AuthService stopped");
+  }
 }

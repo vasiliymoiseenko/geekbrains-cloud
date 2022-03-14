@@ -16,8 +16,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.VBox;
-import ru.geekbrains.cloud.client.netty.Network;
-import ru.geekbrains.cloud.common.service.FileService;
+import ru.geekbrains.cloud.client.netty.NettyClient;
 
 public class Controller implements Initializable {
 
@@ -28,7 +27,7 @@ public class Controller implements Initializable {
 
   PanelController leftPC;
   PanelController rightPC;
-  Network network;
+  NettyClient nettyClient;
 
   public PanelController getRightPC() {
     return rightPC;
@@ -41,7 +40,7 @@ public class Controller implements Initializable {
   @Override
   public void initialize(URL location, ResourceBundle resources){
     createRepositoryFolder();
-    network = new Network(this);
+    nettyClient = new NettyClient(this);
 
     leftPC = (PanelController) clientPanel.getProperties().get("ctrl");
     rightPC = (PanelController) serverPanel.getProperties().get("ctrl");
@@ -112,11 +111,11 @@ public class Controller implements Initializable {
 
 
   public void updateFileListServer() {
-    network.updateFileList();
+    nettyClient.updateFileList();
   }
 
   public void uploadAction(ActionEvent actionEvent) throws IOException{
-    if (leftPC.getSelectedFileName() == null) {
+    /*if (leftPC.getSelectedFileName() == null) {
       Alert alert  = new Alert(AlertType.WARNING, "Файл не выбран", ButtonType.OK);
       alert.showAndWait();
       return;
@@ -124,7 +123,7 @@ public class Controller implements Initializable {
 
     Path path = Paths.get(leftPC.getCurrentPath()).resolve(leftPC.getSelectedFileName());
     System.out.println(path);
-    FileService.sendFile(path, network.getChannel(), future -> {
+    FileService.sendFile(path, nettyClient.getChannel(), future -> {
       //Alert alert = new Alert(AlertType.INFORMATION, "Файл загружается. Это займет какое-то время", ButtonType.OK);
       //alert.showAndWait();
       if (!future.isSuccess()) {
@@ -134,7 +133,7 @@ public class Controller implements Initializable {
         //alert.close();
         System.out.println("Файл успешно передан");
       }
-    });
+    });*/
   }
 
   public void downloadAction(ActionEvent actionEvent) {
@@ -146,7 +145,7 @@ public class Controller implements Initializable {
 
     String fileName = rightPC.getSelectedFileName();
 
-    network.sendDownloadRequest(fileName);
+    nettyClient.sendDownloadRequest(fileName);
   }
 
   public void updateFileListClient(ActionEvent actionEvent) {

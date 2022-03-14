@@ -7,12 +7,20 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.serialization.ClassResolvers;
+import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
 import ru.geekbrains.cloud.server.db.AuthService;
 
-public class Server {
+public class NettyServer {
+
+  private static final int MAXIMUM_OBJECT_SIZE = 1024 * 1024 * 10;
+
   private static AuthService authService = new AuthService();
 
-  public void run() throws Exception {
+  private ChannelFuture channelFuture;
+
+  public void start() throws Exception {
     System.out.println("server started");
 
     authService.start();
@@ -26,19 +34,29 @@ public class Server {
           .childHandler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel socketChannel) throws Exception {
-              socketChannel.pipeline().addLast(new ServerInHandler());
+              socketChannel.pipeline().addLast(
+                  new ObjectDecoder(MAXIMUM_OBJECT_SIZE, ClassResolvers.cacheDisabled(null)),
+                  new ObjectEncoder(),
+                  new NettyServerHandler()
+              );
             }
           });
-      ChannelFuture f = b.bind(45001).sync();
-      f.channel().closeFuture().sync();
+      channelFuture = b.bind(45001).sync();
+      channelFuture.channel().closeFuture().sync();
     } finally {
       workerGroup.shutdownGracefully();
       bossGroup.shutdownGracefully();
     }
   }
 
+  public void stop()
+  {
+    channelFuture.channel().close();
+    authService.stop();
+  }
+
   public static void main(String[] args) throws Exception {
-    new Server().run();
+    new NettyServer().start();
   }
 
 }
