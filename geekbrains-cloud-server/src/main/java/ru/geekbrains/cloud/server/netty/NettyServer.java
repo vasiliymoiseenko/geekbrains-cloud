@@ -1,7 +1,9 @@
 package ru.geekbrains.cloud.server.netty;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -10,6 +12,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import ru.geekbrains.cloud.server.db.AuthService;
@@ -21,6 +25,7 @@ public class NettyServer {
 
 
   private static AuthService authService = new AuthService();
+  private static HashMap<ChannelHandlerContext, String> users = new HashMap<>();
 
   private ChannelFuture channelFuture;
 

@@ -1,4 +1,4 @@
-package ru.geekbrains.cloud.common.type;
+package ru.geekbrains.cloud.common.messages.list;
 
 import java.io.IOException;
 import java.io.Serializable;

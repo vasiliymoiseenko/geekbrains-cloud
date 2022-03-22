@@ -1,17 +1,14 @@
 package ru.geekbrains.cloud.client.javafx;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
-import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -19,9 +16,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableCell;
@@ -32,6 +26,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
@@ -39,7 +34,8 @@ import ru.geekbrains.cloud.client.netty.NettyClient;
 import ru.geekbrains.cloud.common.messages.auth.AuthRequest;
 import ru.geekbrains.cloud.common.messages.list.ListRequest;
 import ru.geekbrains.cloud.common.messages.reg.RegRequest;
-import ru.geekbrains.cloud.common.type.FileInfo;
+import ru.geekbrains.cloud.common.messages.list.FileInfo;
+import ru.geekbrains.cloud.common.service.FileService;
 
 @Log4j2
 public class Controller implements Initializable {
@@ -64,9 +60,12 @@ public class Controller implements Initializable {
   @Getter
   @Setter
   String login;
+  private FileChooser fileChooser;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
+    fileChooser = new FileChooser();
+
     changeStageToAuth();
     createRepositoryFolder();
 
@@ -209,7 +208,6 @@ public class Controller implements Initializable {
     regPane.setVisible(false);
     cloudPane.setVisible(true);
 
-    log.info("Path = " + Paths.get(login));
     nettyClient.send(new ListRequest(login));
   }
 
@@ -217,5 +215,13 @@ public class Controller implements Initializable {
     authMessage.setTextFill(color);
     authMessage.setText(reason);
     authMessage.setVisible(true);
+  }
+
+  public void uploadAction(ActionEvent event) {
+    File file = fileChooser.showOpenDialog(ClientApplication.getPrimaryStage());
+    if (file != null) {
+      log.info("File choosen: " + file.getPath());
+      FileService.sendFile(nettyClient.getChannelFuture().channel(), file, login);
+    }
   }
 }

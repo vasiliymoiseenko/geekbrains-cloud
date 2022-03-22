@@ -6,7 +6,7 @@ import javafx.application.Platform;
 import lombok.extern.log4j.Log4j2;
 import ru.geekbrains.cloud.client.javafx.Controller;
 import ru.geekbrains.cloud.common.messages.list.ListResponse;
-import ru.geekbrains.cloud.common.type.FileInfo;
+import ru.geekbrains.cloud.common.messages.list.FileInfo;
 
 @Log4j2
 public class ListResponseHandler implements ClientRequestHandler {

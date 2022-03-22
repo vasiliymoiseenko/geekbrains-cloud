@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import ru.geekbrains.cloud.common.messages.AbstractMessage;
 import ru.geekbrains.cloud.common.messages.auth.AuthRequest;
+import ru.geekbrains.cloud.common.messages.file.FileMessage;
 import ru.geekbrains.cloud.common.messages.list.ListRequest;
 import ru.geekbrains.cloud.common.messages.reg.RegRequest;
 import ru.geekbrains.cloud.server.netty.NettyServer;
@@ -21,6 +22,7 @@ public class ServerHandlerRegistry {
     requestHandlerMap.put(ListRequest.class, new ListRequestHandler());
     requestHandlerMap.put(AuthRequest.class, new AuthHandler(NettyServer.getAuthService()));
     requestHandlerMap.put(RegRequest.class, new RegHandler(NettyServer.getAuthService()));
+    requestHandlerMap.put(FileMessage.class, new FileUploadHandler());
 
     REQUEST_HANDLER_MAP = Collections.unmodifiableMap(requestHandlerMap);
   }

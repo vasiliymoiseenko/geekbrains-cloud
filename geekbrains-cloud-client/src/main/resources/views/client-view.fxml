@@ -40,10 +40,8 @@
            <TableView fx:id="filesTable" VBox.vgrow="ALWAYS" />
          
            <HBox spacing="5">
-             <!--<Button text="Загрузить на сервер" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#uploadAction"/>
-             <Button text="Удалить с клиента" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#deleteAction"/>
-             <Button text="Обновить клиент" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#updateFileListClient"/>
-             <Button text="Скачать с сервера" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#downloadAction"/>
+             <Button text="Загрузить на сервер" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#uploadAction"/>
+             <!--<Button text="Скачать с сервера" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#downloadAction"/>
              <Button text="Обновить сервер" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#updateFileListServer"/>-->
          
              <padding>

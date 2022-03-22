@@ -30,7 +30,7 @@ public class RegHandler implements ServerRequestHandler {
 
       ctx.writeAndFlush(new RegSuccessResponse()).addListener(channelFuture -> {
         if (channelFuture.isSuccess()) {
-          log.info("RegSuccessResponse sended: User " + regRequest.getLogin() + " registered");
+          log.info(ctx.name() + " RegSuccessResponse sended: User " + regRequest.getLogin() + " registered");
         }
       });
     } catch (SQLException e) {
@@ -44,7 +44,7 @@ public class RegHandler implements ServerRequestHandler {
 
       ctx.writeAndFlush(new RegErrorResponse(reason)).addListener(channelFuture -> {
         if (channelFuture.isSuccess()) {
-          log.info("RegErrorResponse sended: " + reason);
+          log.info(ctx.name() + " RegErrorResponse sended: " + reason);
         }
       });
     }
