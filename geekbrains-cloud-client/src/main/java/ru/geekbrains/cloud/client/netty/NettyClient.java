@@ -21,9 +21,8 @@ public class NettyClient {
 
   private static final int MAXIMUM_OBJECT_SIZE = 1024 * 1024 * 10;
 
-  private volatile ChannelFuture channelFuture;
+  private ChannelFuture channelFuture;
 
-  private Channel channel;
   private Controller controller;
 
   public NettyClient(Controller controller) {
@@ -42,7 +41,6 @@ public class NettyClient {
                     new ObjectDecoder(MAXIMUM_OBJECT_SIZE, ClassResolvers.cacheDisabled(null)),
                     new ObjectEncoder(),
                     new NettyClientHandler(controller));
-                channel = socketChannel;
               }
             });
         channelFuture = b.connect("localhost", 45001).sync();
@@ -56,12 +54,9 @@ public class NettyClient {
     }).start();
   }
 
-  public Channel getChannel() {
-    return channel;
-  }
 
   public void updateFileList() {
-    channel.writeAndFlush(new ListRequest());
+    channelFuture.channel().writeAndFlush(new ListRequest());
   }
 
   public void sendDownloadRequest(String fileName) {
