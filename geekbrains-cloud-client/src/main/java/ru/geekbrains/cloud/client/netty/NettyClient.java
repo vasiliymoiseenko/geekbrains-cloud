@@ -1,9 +1,6 @@
 package ru.geekbrains.cloud.client.netty;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
@@ -13,9 +10,10 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
-import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CountDownLatch;
 import ru.geekbrains.cloud.client.javafx.Controller;
-import ru.geekbrains.cloud.common.messages.ListRequest;
+import ru.geekbrains.cloud.common.messages.AbstractMessage;
+import ru.geekbrains.cloud.common.messages.list.ListRequest;
 
 public class NettyClient implements Runnable{
 
@@ -24,9 +22,11 @@ public class NettyClient implements Runnable{
   private ChannelFuture channelFuture;
 
   private Controller controller;
+  private CountDownLatch countDownLatch;
 
-  public NettyClient(Controller controller) {
+  public NettyClient(Controller controller, CountDownLatch countDownLatch) {
     this.controller = controller;
+    this.countDownLatch = countDownLatch;
   }
 
   @Override
@@ -47,23 +47,16 @@ public class NettyClient implements Runnable{
             }
           });
       channelFuture = b.connect("localhost", 45001).sync();
-      updateFileList();
+      countDownLatch.countDown();
       channelFuture.channel().closeFuture().sync();
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
       workerGroup.shutdownGracefully();
     }
-
   }
 
-  public void updateFileList() {
-    channelFuture.channel().writeAndFlush(new ListRequest());
+  public void send(AbstractMessage message) {
+    channelFuture.channel().writeAndFlush(message);
   }
-
-  public void sendDownloadRequest(String fileName) {
-    //channel.writeAndFlush(buf);
-  }
-
-
 }

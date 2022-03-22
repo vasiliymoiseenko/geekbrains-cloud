@@ -22,13 +22,11 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
   private Controller controller;
 
   public NettyClientHandler(Controller controller) {
-    System.out.println("123");
     this.controller = controller;
   }
 
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-    System.out.println("111");
     ClientRequestHandler handler = ClientHandlerRegistry.getHandler(msg.getClass());
     handler.handle(ctx, msg, controller);
   }

@@ -4,8 +4,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import ru.geekbrains.cloud.common.messages.AbstractMessage;
-import ru.geekbrains.cloud.common.messages.ListRequest;
-import ru.geekbrains.cloud.common.messages.ListResponse;
+import ru.geekbrains.cloud.common.messages.auth.AuthErrorResponse;
+import ru.geekbrains.cloud.common.messages.auth.AuthSuccessResponse;
+import ru.geekbrains.cloud.common.messages.list.ListResponse;
+import ru.geekbrains.cloud.common.messages.reg.RegErrorResponse;
+import ru.geekbrains.cloud.common.messages.reg.RegSuccessResponse;
 
 public class ClientHandlerRegistry {
 
@@ -14,6 +17,10 @@ public class ClientHandlerRegistry {
   static {
     Map<Class<? extends AbstractMessage>, ClientRequestHandler> requestHandlerMap = new HashMap<>();
     requestHandlerMap.put(ListResponse.class, new ListResponseHandler());
+    requestHandlerMap.put(RegErrorResponse.class, new RegErrorResponseHandler());
+    requestHandlerMap.put(RegSuccessResponse.class, new RegSuccessResponseHandler());
+    requestHandlerMap.put(AuthErrorResponse.class, new AuthErrorResponseHandler());
+    requestHandlerMap.put(AuthSuccessResponse.class, new AuthSuccessResponseHandler());
 
     REQUEST_HANDLER_MAP = Collections.unmodifiableMap(requestHandlerMap);
   }

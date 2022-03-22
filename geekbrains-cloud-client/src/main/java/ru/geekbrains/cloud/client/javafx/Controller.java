@@ -10,6 +10,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
@@ -30,43 +31,42 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 import ru.geekbrains.cloud.client.netty.NettyClient;
+import ru.geekbrains.cloud.common.messages.auth.AuthRequest;
+import ru.geekbrains.cloud.common.messages.list.ListRequest;
+import ru.geekbrains.cloud.common.messages.reg.RegRequest;
 import ru.geekbrains.cloud.common.type.FileInfo;
 
+@Log4j2
 public class Controller implements Initializable {
-
-  @FXML
-  GridPane authPane;
-  @FXML
-  TextField authLogin;
-  @FXML
-  PasswordField authPassword;
-  @FXML
-  Label authMessage;
-
-  @FXML
-  GridPane regPane;
-  @FXML
-  TextField regLogin;
-  @FXML
-  PasswordField regPassword;
-  @FXML
-  PasswordField regPasswordRep;
-  @FXML
-  Label regMessage;
-
-
-  @FXML
-  VBox cloudPane;
-  @FXML
-  TextField pathField;
-  @FXML
-  TableView<FileInfo> filesTable;
 
   NettyClient nettyClient;
 
+  @FXML GridPane authPane;
+  @FXML TextField authLogin;
+  @FXML PasswordField authPassword;
+  @FXML Label authMessage;
+
+  @FXML GridPane regPane;
+  @FXML TextField regLogin;
+  @FXML PasswordField regPassword;
+  @FXML PasswordField regPasswordRep;
+  @FXML Label regMessage;
+
+  @FXML VBox cloudPane;
+  @FXML TextField pathField;
+  @FXML TableView<FileInfo> filesTable;
+
+  @Getter
+  @Setter
+  String login;
+
   @Override
-  public void initialize(URL location, ResourceBundle resources){
+  public void initialize(URL location, ResourceBundle resources) {
     changeStageToAuth();
     createRepositoryFolder();
 
@@ -137,9 +137,9 @@ public class Controller implements Initializable {
     Platform.exit();
   }
 
-  public void updateFileListServer() {
+ /* public void updateFileListServer() {
     nettyClient.updateFileList();
-  }
+  }*/
 
   public void changeStageToReg() {
     regLogin.clear();
@@ -152,14 +152,40 @@ public class Controller implements Initializable {
     cloudPane.setVisible(false);
   }
 
-  public void enterCloud() {
-    if (nettyClient == null) {
-      nettyClient = new NettyClient(this);
-      new Thread(nettyClient).start();
+  public void enterCloud() throws InterruptedException {
+    connection();
+
+    if (authLogin.getText().isEmpty() || authPassword.getText().isEmpty()) {
+      authMessage.setText("Enter login and password");
+      authMessage.setVisible(true);
+    } else {
+      log.info("Trying to log in: " + authLogin.getText());
+      nettyClient.send(new AuthRequest(authLogin.getText(), authPassword.getText()));
     }
   }
 
-  public void register() {
+  public void register() throws InterruptedException {
+    connection();
+
+    if (regLogin.getText().isEmpty() || regPassword.getText().isEmpty() || regPasswordRep.getText().isEmpty()) {
+      regMessage.setTextFill(Color.RED);
+      regMessage.setText("Enter login, password and name");
+      regMessage.setVisible(true);
+    } else if (!regPassword.getText().equals(regPasswordRep.getText())) {
+      regMessage.setTextFill(Color.RED);
+      regMessage.setText("Passwords do not match");
+      regMessage.setVisible(true);
+    } else {
+      log.info("Trying to register a new user: " + regLogin.getText());
+      nettyClient.send(new RegRequest(regLogin.getText(), regPassword.getText(), 2));
+    }
+  }
+
+  private void connection() throws InterruptedException {
+    CountDownLatch countDownLatch = new CountDownLatch(1);
+    nettyClient = new NettyClient(this, countDownLatch);
+    new Thread(nettyClient).start();
+    countDownLatch.await();
   }
 
   public void changeStageToAuth() {
@@ -170,5 +196,26 @@ public class Controller implements Initializable {
     authPane.setVisible(true);
     regPane.setVisible(false);
     cloudPane.setVisible(false);
+  }
+
+  public void showRegMessage(String reason, Color color) {
+    regMessage.setTextFill(color);
+    regMessage.setText(reason);
+    regMessage.setVisible(true);
+  }
+
+  public void changeStageToCloud() {
+    authPane.setVisible(false);
+    regPane.setVisible(false);
+    cloudPane.setVisible(true);
+
+    log.info("Path = " + Paths.get(login));
+    nettyClient.send(new ListRequest(login));
+  }
+
+  public void showAuthMessage(String reason, Color color) {
+    authMessage.setTextFill(color);
+    authMessage.setText(reason);
+    authMessage.setVisible(true);
   }
 }

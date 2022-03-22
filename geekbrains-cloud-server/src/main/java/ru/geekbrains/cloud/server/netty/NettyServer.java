@@ -10,18 +10,26 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
+import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 import ru.geekbrains.cloud.server.db.AuthService;
 
+@Log4j2
 public class NettyServer {
 
   private static final int MAXIMUM_OBJECT_SIZE = 1024 * 1024 * 10;
+
 
   private static AuthService authService = new AuthService();
 
   private ChannelFuture channelFuture;
 
+  public static AuthService getAuthService() {
+    return authService;
+  }
+
   public void start() throws Exception {
-    System.out.println("server started");
+    log.info("Server started");
 
     authService.start();
 
