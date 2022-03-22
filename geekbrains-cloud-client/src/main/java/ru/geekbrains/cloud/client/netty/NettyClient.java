@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 import ru.geekbrains.cloud.client.javafx.Controller;
 import ru.geekbrains.cloud.common.messages.ListRequest;
 
-public class NettyClient {
+public class NettyClient implements Runnable{
 
   private static final int MAXIMUM_OBJECT_SIZE = 1024 * 1024 * 10;
 
@@ -27,33 +27,35 @@ public class NettyClient {
 
   public NettyClient(Controller controller) {
     this.controller = controller;
-    new Thread(() -> {
-      EventLoopGroup workerGroup = new NioEventLoopGroup();
-
-      try {
-        Bootstrap b = new Bootstrap();
-        b.group(workerGroup)
-            .channel(NioSocketChannel.class)
-            .handler(new ChannelInitializer<SocketChannel>() {
-              @Override
-              protected void initChannel(SocketChannel socketChannel) throws Exception {
-                socketChannel.pipeline().addLast(
-                    new ObjectDecoder(MAXIMUM_OBJECT_SIZE, ClassResolvers.cacheDisabled(null)),
-                    new ObjectEncoder(),
-                    new NettyClientHandler(controller));
-              }
-            });
-        channelFuture = b.connect("localhost", 45001).sync();
-        updateFileList();
-        channelFuture.channel().closeFuture().sync();
-      } catch (Exception e) {
-        e.printStackTrace();
-      } finally {
-        workerGroup.shutdownGracefully();
-      }
-    }).start();
   }
 
+  @Override
+  public void run() {
+    EventLoopGroup workerGroup = new NioEventLoopGroup();
+
+    try {
+      Bootstrap b = new Bootstrap();
+      b.group(workerGroup)
+          .channel(NioSocketChannel.class)
+          .handler(new ChannelInitializer<SocketChannel>() {
+            @Override
+            protected void initChannel(SocketChannel socketChannel) throws Exception {
+              socketChannel.pipeline().addLast(
+                  new ObjectDecoder(MAXIMUM_OBJECT_SIZE, ClassResolvers.cacheDisabled(null)),
+                  new ObjectEncoder(),
+                  new NettyClientHandler(controller));
+            }
+          });
+      channelFuture = b.connect("localhost", 45001).sync();
+      updateFileList();
+      channelFuture.channel().closeFuture().sync();
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      workerGroup.shutdownGracefully();
+    }
+
+  }
 
   public void updateFileList() {
     channelFuture.channel().writeAndFlush(new ListRequest());
@@ -62,4 +64,6 @@ public class NettyClient {
   public void sendDownloadRequest(String fileName) {
     //channel.writeAndFlush(buf);
   }
+
+
 }

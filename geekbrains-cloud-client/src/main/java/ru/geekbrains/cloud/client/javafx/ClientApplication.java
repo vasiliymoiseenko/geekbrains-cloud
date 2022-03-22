@@ -10,7 +10,7 @@ public class ClientApplication extends Application {
 
   @Override
   public void start(Stage stage) throws IOException {
-    FXMLLoader fxmlLoader = new FXMLLoader(ClientApplication.class.getResource("/views/file-manager-view.fxml"));
+    FXMLLoader fxmlLoader = new FXMLLoader(ClientApplication.class.getResource("/views/client-view.fxml"));
     Scene scene = new Scene(fxmlLoader.load(), 1080, 720);
     stage.setTitle("GeekBrains Cloud!");
     stage.setScene(scene);

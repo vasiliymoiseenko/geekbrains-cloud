@@ -7,45 +7,122 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import ru.geekbrains.cloud.client.netty.NettyClient;
+import ru.geekbrains.cloud.common.type.FileInfo;
 
 public class Controller implements Initializable {
 
   @FXML
-  VBox clientPanel;
+  GridPane authPane;
   @FXML
-  VBox serverPanel;
+  TextField authLogin;
+  @FXML
+  PasswordField authPassword;
+  @FXML
+  Label authMessage;
 
-  PanelController leftPC;
-  PanelController rightPC;
+  @FXML
+  GridPane regPane;
+  @FXML
+  TextField regLogin;
+  @FXML
+  PasswordField regPassword;
+  @FXML
+  PasswordField regPasswordRep;
+  @FXML
+  Label regMessage;
+
+
+  @FXML
+  VBox cloudPane;
+  @FXML
+  TextField pathField;
+  @FXML
+  TableView<FileInfo> filesTable;
+
   NettyClient nettyClient;
-
-  public PanelController getRightPC() {
-    return rightPC;
-  }
-
-  public PanelController getLeftPC() {
-    return leftPC;
-  }
 
   @Override
   public void initialize(URL location, ResourceBundle resources){
+    changeStageToAuth();
     createRepositoryFolder();
-    nettyClient = new NettyClient(this);
 
-    leftPC = (PanelController) clientPanel.getProperties().get("ctrl");
-    rightPC = (PanelController) serverPanel.getProperties().get("ctrl");
+    TableColumn<FileInfo, String> fileTypeColumn = new TableColumn<>();
+    fileTypeColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getType().getName()));
+    fileTypeColumn.setPrefWidth(25);
 
-    leftPC.updateList(Paths.get("client_repository"));
+    TableColumn<FileInfo, String> fileNameColumn = new TableColumn<>("Имя");
+    fileNameColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getFileName()));
+    fileNameColumn.setPrefWidth(250);
+
+    TableColumn<FileInfo, Long> fileSizeColumn = new TableColumn<>("Размер");
+    fileSizeColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getSize()));
+    fileSizeColumn.setPrefWidth(100);
+    fileSizeColumn.setCellFactory(column -> new TableCell<FileInfo, Long>() {
+      @Override
+      protected void updateItem(Long item, boolean empty) {
+        super.updateItem(item, empty);
+        if (item == null || empty) {
+          setText("");
+          setStyle("");
+        } else {
+          String text = String.format("%,d b", item);
+          if (item == -1L) {
+            text = "";
+          }
+          setText(text);
+        }
+      }
+    });
+
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    TableColumn<FileInfo, String> fileDateColumn = new TableColumn<>("Дата изменения");
+    fileDateColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getLastModified().format(dtf)));
+    fileDateColumn.setPrefWidth(150);
+
+    filesTable.getColumns().addAll(fileTypeColumn, fileNameColumn, fileSizeColumn, fileDateColumn);
+    filesTable.getSortOrder().add(fileTypeColumn);
+
+    filesTable.setOnMouseClicked(new EventHandler<MouseEvent>() {
+      @Override
+      public void handle(MouseEvent event) {
+        if (event.getClickCount() == 2) {
+          Path path = Paths.get(pathField.getText()).resolve(filesTable.getSelectionModel().getSelectedItem().getFileName());
+          if (Files.isDirectory(path)) {
+            //updateList(path);
+          }
+        }
+      }
+    });
+  }
+
+  public void updateList(List<FileInfo> list) {
+    filesTable.getItems().clear();
+    filesTable.getItems().addAll(list);
+    filesTable.sort();
   }
 
   private void createRepositoryFolder() {
@@ -60,95 +137,38 @@ public class Controller implements Initializable {
     Platform.exit();
   }
 
-  public void copyAction(ActionEvent actionEvent) {
-
-    if (leftPC.getSelectedFileName() == null && rightPC.getSelectedFileName() == null) {
-      Alert alert  = new Alert(AlertType.WARNING, "Ни один файл не выбран", ButtonType.OK);
-      alert.showAndWait();
-      return;
-    }
-
-    PanelController srcPC, dstPC = null;
-    if (leftPC.getSelectedFileName() != null) {
-      srcPC = leftPC;
-      dstPC = rightPC;
-    } else {
-      srcPC = rightPC;
-      dstPC = leftPC;
-    }
-
-    Path srcPath = Paths.get(srcPC.getCurrentPath(), srcPC.getSelectedFileName());
-    Path dstPath = Paths.get(dstPC.getCurrentPath()).resolve(srcPC.getSelectedFileName());
-
-    try {
-      Files.copy(srcPath, dstPath, StandardCopyOption.REPLACE_EXISTING);
-      dstPC.updateList();
-    } catch (IOException e) {
-      Alert alert  = new Alert(AlertType.WARNING, "Не удалось скопировать файл", ButtonType.OK);
-      alert.showAndWait();
-    }
-  }
-
-  public void deleteAction(ActionEvent actionEvent) {
-    PanelController leftPC = (PanelController) clientPanel.getProperties().get("ctrl");
-
-    if (leftPC.getSelectedFileName() == null) {
-      Alert alert  = new Alert(AlertType.WARNING, "Ни один файл не выбран", ButtonType.OK);
-      alert.showAndWait();
-      return;
-    }
-
-    Path srcPath = Paths.get(leftPC.getCurrentPath(), leftPC.getSelectedFileName());
-
-    try {
-      Files.deleteIfExists(srcPath);
-      leftPC.updateList();
-    } catch (IOException e) {
-      Alert alert  = new Alert(AlertType.WARNING, "Не удалось удалить файл", ButtonType.OK);
-      alert.showAndWait();
-    }
-  }
-
-
   public void updateFileListServer() {
     nettyClient.updateFileList();
   }
 
-  public void uploadAction(ActionEvent actionEvent) throws IOException{
-    /*if (leftPC.getSelectedFileName() == null) {
-      Alert alert  = new Alert(AlertType.WARNING, "Файл не выбран", ButtonType.OK);
-      alert.showAndWait();
-      return;
-    }
+  public void changeStageToReg() {
+    regLogin.clear();
+    regPassword.clear();
+    regPasswordRep.clear();
+    regMessage.setVisible(false);
 
-    Path path = Paths.get(leftPC.getCurrentPath()).resolve(leftPC.getSelectedFileName());
-    System.out.println(path);
-    FileService.sendFile(path, nettyClient.getChannel(), future -> {
-      //Alert alert = new Alert(AlertType.INFORMATION, "Файл загружается. Это займет какое-то время", ButtonType.OK);
-      //alert.showAndWait();
-      if (!future.isSuccess()) {
-        future.cause().printStackTrace();
-      }
-      if (future.isSuccess()) {
-        //alert.close();
-        System.out.println("Файл успешно передан");
-      }
-    });*/
+    authPane.setVisible(false);
+    regPane.setVisible(true);
+    cloudPane.setVisible(false);
   }
 
-  public void downloadAction(ActionEvent actionEvent) {
-    if (rightPC.getSelectedFileName() == null){
-      Alert alert  = new Alert(AlertType.WARNING, "Файл не выбран", ButtonType.OK);
-      alert.showAndWait();
-      return;
+  public void enterCloud() {
+    if (nettyClient == null) {
+      nettyClient = new NettyClient(this);
+      new Thread(nettyClient).start();
     }
-
-    String fileName = rightPC.getSelectedFileName();
-
-    nettyClient.sendDownloadRequest(fileName);
   }
 
-  public void updateFileListClient(ActionEvent actionEvent) {
-    leftPC.updateList();
+  public void register() {
+  }
+
+  public void changeStageToAuth() {
+    authLogin.clear();
+    authPassword.clear();
+    authMessage.setVisible(false);
+
+    authPane.setVisible(true);
+    regPane.setVisible(false);
+    cloudPane.setVisible(false);
   }
 }

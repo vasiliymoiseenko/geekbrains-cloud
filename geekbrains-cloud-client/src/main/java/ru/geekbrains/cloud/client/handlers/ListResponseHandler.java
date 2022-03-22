@@ -13,6 +13,6 @@ public class ListResponseHandler implements ClientRequestHandler{
   public void handle(ChannelHandlerContext ctx, Object msg, Controller controller) {
     System.out.println("List");
     List<FileInfo> list = ((ListResponse) msg).getList();
-    Platform.runLater(() -> controller.getRightPC().updateList(list));
+    Platform.runLater(() -> controller.updateList(list));
   }
 }
