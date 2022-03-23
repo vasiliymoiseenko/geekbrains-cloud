@@ -3,10 +3,9 @@ package ru.geekbrains.cloud.server.handlers;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.Getter;
-import lombok.Setter;
 import ru.geekbrains.cloud.common.messages.AbstractMessage;
 import ru.geekbrains.cloud.common.messages.auth.AuthRequest;
+import ru.geekbrains.cloud.common.messages.del.DeleteRequest;
 import ru.geekbrains.cloud.common.messages.file.FileMessage;
 import ru.geekbrains.cloud.common.messages.file.FileRequest;
 import ru.geekbrains.cloud.common.messages.list.ListRequest;
@@ -25,6 +24,7 @@ public class ServerHandlerRegistry {
     requestHandlerMap.put(RegRequest.class, new RegHandler(NettyServer.getAuthService()));
     requestHandlerMap.put(FileMessage.class, new FileUploadHandler());
     requestHandlerMap.put(FileRequest.class, new FileRequestHandler());
+    requestHandlerMap.put(DeleteRequest.class, new DeleteRequestHandler());
 
     REQUEST_HANDLER_MAP = Collections.unmodifiableMap(requestHandlerMap);
   }

@@ -42,7 +42,7 @@
            <HBox spacing="5">
              <Button text="Загрузить на сервер" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#uploadAction"/>
              <Button text="Скачать с сервера" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#downloadAction"/>
-             <!--<Button text="Обновить сервер" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#updateFileListServer"/>&ndash;&gt;-->
+             <Button text="Удалить файл" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#deleteAction"/>
          
              <padding>
                <Insets bottom="5" left="5" right="5" top="5" />

@@ -35,6 +35,7 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import ru.geekbrains.cloud.client.netty.NettyClient;
 import ru.geekbrains.cloud.common.messages.auth.AuthRequest;
+import ru.geekbrains.cloud.common.messages.del.DeleteRequest;
 import ru.geekbrains.cloud.common.messages.file.FileRequest;
 import ru.geekbrains.cloud.common.messages.list.ListRequest;
 import ru.geekbrains.cloud.common.messages.reg.RegRequest;
@@ -224,7 +225,7 @@ public class Controller implements Initializable {
   public void uploadAction(ActionEvent event) {
     File file = fileChooser.showOpenDialog(ClientApplication.getPrimaryStage());
     if (file != null) {
-      log.info("File choosen: " + file.getPath());
+      log.info("File chosen: " + file.getPath());
       FileService.sendFile(nettyClient.getChannelFuture().channel(), file, login);
     }
   }
@@ -245,5 +246,19 @@ public class Controller implements Initializable {
 
   public void updatePathField(String path) {
     pathField.setText(path);
+  }
+
+  public void deleteAction(ActionEvent event) {
+    if (filesTable.getSelectionModel().getSelectedItem() == null){
+      Alert alert  = new Alert(AlertType.WARNING, "File not selected", ButtonType.OK);
+      alert.showAndWait();
+      return;
+    }
+
+    String fileName = filesTable.getSelectionModel().getSelectedItem().getFileName();
+    String path = pathField.getText();
+
+    nettyClient.send(new DeleteRequest(fileName, path));
+    log.info("DeleteRequest sent: " + Paths.get(path,fileName));
   }
 }
