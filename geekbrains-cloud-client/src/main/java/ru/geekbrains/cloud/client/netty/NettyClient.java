@@ -14,8 +14,7 @@ import java.util.concurrent.CountDownLatch;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import ru.geekbrains.cloud.client.javafx.Controller;
-import ru.geekbrains.cloud.common.messages.AbstractMessage;
-import ru.geekbrains.cloud.common.messages.list.ListRequest;
+import ru.geekbrains.cloud.common.messages.abs.AbstractMessage;
 
 @Log4j2
 public class NettyClient implements Runnable{

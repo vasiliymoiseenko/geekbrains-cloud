@@ -1,4 +1,4 @@
-package ru.geekbrains.cloud.common.messages;
+package ru.geekbrains.cloud.common.messages.abs;
 
 import java.io.Serializable;
 

@@ -3,7 +3,7 @@ package ru.geekbrains.cloud.client.handlers;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import ru.geekbrains.cloud.common.messages.AbstractMessage;
+import ru.geekbrains.cloud.common.messages.abs.AbstractMessage;
 import ru.geekbrains.cloud.common.messages.auth.AuthErrorResponse;
 import ru.geekbrains.cloud.common.messages.auth.AuthSuccessResponse;
 import ru.geekbrains.cloud.common.messages.file.FileMessage;

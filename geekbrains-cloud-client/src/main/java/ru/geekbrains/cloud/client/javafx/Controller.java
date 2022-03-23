@@ -16,8 +16,12 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -27,16 +31,21 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import ru.geekbrains.cloud.client.netty.NettyClient;
 import ru.geekbrains.cloud.common.messages.auth.AuthRequest;
-import ru.geekbrains.cloud.common.messages.del.DeleteRequest;
+import ru.geekbrains.cloud.common.messages.file.DeleteRequest;
 import ru.geekbrains.cloud.common.messages.file.FileRequest;
+import ru.geekbrains.cloud.common.messages.file.MakeDirRequest;
+import ru.geekbrains.cloud.common.messages.list.FileInfo.FileType;
 import ru.geekbrains.cloud.common.messages.list.ListRequest;
 import ru.geekbrains.cloud.common.messages.reg.RegRequest;
 import ru.geekbrains.cloud.common.messages.list.FileInfo;
@@ -114,9 +123,10 @@ public class Controller implements Initializable {
       @Override
       public void handle(MouseEvent event) {
         if (event.getClickCount() == 2) {
-          Path path = Paths.get(pathField.getText()).resolve(filesTable.getSelectionModel().getSelectedItem().getFileName());
-          if (Files.isDirectory(path)) {
-            //updateList(path);
+          String fileName = filesTable.getSelectionModel().getSelectedItem().getFileName();
+          String path = pathField.getText();
+          if (filesTable.getSelectionModel().getSelectedItem().getType() == FileType.DIRECTORY) {
+            nettyClient.send(new ListRequest(Paths.get(path, fileName).toString()));
           }
         }
       }
@@ -226,7 +236,7 @@ public class Controller implements Initializable {
     File file = fileChooser.showOpenDialog(ClientApplication.getPrimaryStage());
     if (file != null) {
       log.info("File chosen: " + file.getPath());
-      FileService.sendFile(nettyClient.getChannelFuture().channel(), file, login);
+      FileService.sendFile(nettyClient.getChannelFuture().channel(), file, pathField.getText());
     }
   }
 
@@ -260,5 +270,68 @@ public class Controller implements Initializable {
 
     nettyClient.send(new DeleteRequest(fileName, path));
     log.info("DeleteRequest sent: " + Paths.get(path,fileName));
+  }
+
+  public void makeDirectory(ActionEvent event) {
+    Label secondLabel = new Label("Enter directory name:");
+    
+    TextField textField = new TextField();
+    textField.setPrefWidth(150);
+    
+    Button btnCreate = new Button("Create");
+    Button btnCancel = new Button("Cancel");
+    
+    HBox hBox = new HBox();
+    hBox.setAlignment(Pos.CENTER);
+    hBox.setSpacing(20);
+    hBox.getChildren().addAll(btnCreate, btnCancel);
+
+    VBox vBox = new VBox();
+    vBox.setSpacing(10);
+    vBox.setPadding(new Insets(20));
+    vBox.setAlignment(Pos.CENTER);
+    vBox.getChildren().addAll(secondLabel, textField, hBox);
+
+    Scene secondScene = new Scene(vBox, 250, 100);
+
+    // New window (Stage)
+    Stage newWindow = new Stage();
+    newWindow.setTitle("Second Stage");
+    newWindow.setScene(secondScene);
+
+    // Set position of second window, related to primary window.
+    newWindow.setX(ClientApplication.getPrimaryStage().getX());
+    newWindow.setY(ClientApplication.getPrimaryStage().getY());
+
+    newWindow.show();
+
+    btnCreate.setOnAction(new EventHandler<ActionEvent>() {
+
+      @Override
+      public void handle(ActionEvent event) {
+        String fileName = textField.getText();
+        String path = pathField.getText();
+
+        nettyClient.send(new MakeDirRequest(fileName, path));
+        log.info("MakeDirRequest sent: " + Paths.get(path, fileName));
+
+        newWindow.close();
+      }
+    });
+
+    btnCancel.setOnAction(new EventHandler<ActionEvent>() {
+
+      @Override
+      public void handle(ActionEvent event) {
+        newWindow.close();
+      }
+    });
+  }
+
+  public void pathUpAction(ActionEvent event) {
+    String path = pathField.getText();
+    if (!path.equals(login)) {
+      nettyClient.send(new ListRequest(Paths.get(path).getParent().toString()));
+    }
   }
 }

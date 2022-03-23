@@ -1,7 +1,7 @@
 package ru.geekbrains.cloud.common.messages.auth;
 
 import lombok.Value;
-import ru.geekbrains.cloud.common.messages.AbstractMessage;
+import ru.geekbrains.cloud.common.messages.abs.AbstractMessage;
 
 @Value
 public class AuthRequest extends AbstractMessage {
