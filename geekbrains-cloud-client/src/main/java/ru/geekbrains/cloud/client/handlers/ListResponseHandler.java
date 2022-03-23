@@ -13,8 +13,16 @@ public class ListResponseHandler implements ClientRequestHandler {
 
   @Override
   public void handle(ChannelHandlerContext ctx, Object msg, Controller controller) {
-    log.info("Received a list from the server");
-    List<FileInfo> list = ((ListResponse) msg).getList();
-    Platform.runLater(() -> controller.updateList(list));
+    ListResponse listResponse = (ListResponse) msg;
+
+    List<FileInfo> list = listResponse.getList();
+    String path = listResponse.getPath();
+
+    log.info("Received a list from the server: " + path);
+
+    Platform.runLater(() -> {
+      controller.updateList(list);
+      controller.updatePathField(path);
+    });
   }
 }

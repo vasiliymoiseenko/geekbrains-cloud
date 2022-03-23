@@ -8,4 +8,5 @@ import ru.geekbrains.cloud.common.messages.AbstractMessage;
 public class ListResponse extends AbstractMessage {
 
   private List<FileInfo> list;
+  private String path;
 }

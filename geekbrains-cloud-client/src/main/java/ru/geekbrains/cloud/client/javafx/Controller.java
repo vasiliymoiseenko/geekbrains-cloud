@@ -16,6 +16,9 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableCell;
@@ -32,6 +35,7 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import ru.geekbrains.cloud.client.netty.NettyClient;
 import ru.geekbrains.cloud.common.messages.auth.AuthRequest;
+import ru.geekbrains.cloud.common.messages.file.FileRequest;
 import ru.geekbrains.cloud.common.messages.list.ListRequest;
 import ru.geekbrains.cloud.common.messages.reg.RegRequest;
 import ru.geekbrains.cloud.common.messages.list.FileInfo;
@@ -223,5 +227,23 @@ public class Controller implements Initializable {
       log.info("File choosen: " + file.getPath());
       FileService.sendFile(nettyClient.getChannelFuture().channel(), file, login);
     }
+  }
+
+  public void downloadAction(ActionEvent event) {
+    if (filesTable.getSelectionModel().getSelectedItem() == null){
+      Alert alert  = new Alert(AlertType.WARNING, "File not selected", ButtonType.OK);
+      alert.showAndWait();
+      return;
+    }
+
+    String fileName = filesTable.getSelectionModel().getSelectedItem().getFileName();
+    String path = pathField.getText();
+
+    nettyClient.send(new FileRequest(fileName, path));
+    log.info("FileRequest sent: " + Paths.get(path,fileName));
+  }
+
+  public void updatePathField(String path) {
+    pathField.setText(path);
   }
 }

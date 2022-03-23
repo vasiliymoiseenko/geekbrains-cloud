@@ -52,15 +52,15 @@ public class FileService {
     }).start();
   }
 
-  public static void sendList(ChannelHandlerContext ctx, String folder) {
-    Path path = Paths.get("server_repository").resolve(folder);
+  public static void sendList(ChannelHandlerContext ctx, String path) {
+    Path fullPath = Paths.get("server_repository").resolve(path);
 
     try {
-      List<FileInfo> list = Files.list(path).map(FileInfo::new).collect(Collectors.toList());
+      List<FileInfo> list = Files.list(fullPath).map(FileInfo::new).collect(Collectors.toList());
 
-      ctx.writeAndFlush(new ListResponse(list)).addListener(channelFuture -> {
+      ctx.writeAndFlush(new ListResponse(list, path)).addListener(channelFuture -> {
         if (channelFuture.isSuccess()) {
-          log.info(ctx.name() + " List sent: " + path);
+          log.info(ctx.name() + " List sent: " + fullPath);
         }
       });
     } catch (IOException e) {

@@ -6,6 +6,7 @@ import java.util.Map;
 import ru.geekbrains.cloud.common.messages.AbstractMessage;
 import ru.geekbrains.cloud.common.messages.auth.AuthErrorResponse;
 import ru.geekbrains.cloud.common.messages.auth.AuthSuccessResponse;
+import ru.geekbrains.cloud.common.messages.file.FileMessage;
 import ru.geekbrains.cloud.common.messages.list.ListResponse;
 import ru.geekbrains.cloud.common.messages.reg.RegErrorResponse;
 import ru.geekbrains.cloud.common.messages.reg.RegSuccessResponse;
@@ -21,6 +22,7 @@ public class ClientHandlerRegistry {
     requestHandlerMap.put(RegSuccessResponse.class, new RegSuccessResponseHandler());
     requestHandlerMap.put(AuthErrorResponse.class, new AuthErrorResponseHandler());
     requestHandlerMap.put(AuthSuccessResponse.class, new AuthSuccessResponseHandler());
+    requestHandlerMap.put(FileMessage.class, new FileDownloadHandler());
 
     REQUEST_HANDLER_MAP = Collections.unmodifiableMap(requestHandlerMap);
   }
