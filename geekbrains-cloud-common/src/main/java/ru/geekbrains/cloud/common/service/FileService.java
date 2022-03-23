@@ -2,13 +2,22 @@ package ru.geekbrains.cloud.common.service;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import javafx.application.Platform;
 import lombok.extern.log4j.Log4j2;
 import ru.geekbrains.cloud.common.messages.file.FileMessage;
+import ru.geekbrains.cloud.common.messages.list.FileInfo;
+import ru.geekbrains.cloud.common.messages.list.ListErrorResponse;
+import ru.geekbrains.cloud.common.messages.list.ListResponse;
 
 @Log4j2
 public class FileService {
@@ -33,7 +42,7 @@ public class FileService {
           }
           ChannelFuture f = channel.writeAndFlush(fileMessage);
           f.sync();
-          log.info("Отправлена часть #" + (i + 1));
+          log.info("File " + fileMessage.filename + " part " + (i + 1) + "/" + partsCount + " sent");
         }
 
         in.close();
@@ -41,6 +50,27 @@ public class FileService {
         e.printStackTrace();
       }
     }).start();
+  }
+
+  public static void sendList(ChannelHandlerContext ctx, String folder) {
+    Path path = Paths.get("server_repository").resolve(folder);
+
+    try {
+      List<FileInfo> list = Files.list(path).map(FileInfo::new).collect(Collectors.toList());
+
+      ctx.writeAndFlush(new ListResponse(list)).addListener(channelFuture -> {
+        if (channelFuture.isSuccess()) {
+          log.info(ctx.name() + " List sent: " + path);
+        }
+      });
+    } catch (IOException e) {
+      String reason = e.toString();
+      ctx.writeAndFlush(new ListErrorResponse(reason)).addListener(channelFuture -> {
+        if (channelFuture.isSuccess()) {
+          log.info(ctx.name() + " ListErrorResponse sent: " + reason);
+        }
+      });
+    }
   }
 
 }
