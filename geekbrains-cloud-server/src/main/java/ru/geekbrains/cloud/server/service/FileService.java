@@ -1,4 +1,4 @@
-package ru.geekbrains.cloud.common.service;
+package ru.geekbrains.cloud.server.service;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -12,7 +12,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import javafx.application.Platform;
 import lombok.extern.log4j.Log4j2;
 import ru.geekbrains.cloud.common.messages.file.FileMessage;
 import ru.geekbrains.cloud.common.messages.list.FileInfo;
@@ -42,6 +41,7 @@ public class FileService {
           }
           ChannelFuture f = channel.writeAndFlush(fileMessage);
           f.sync();
+          //progress bar
           log.info("File " + fileMessage.filename + " part " + (i + 1) + "/" + partsCount + " sent");
         }
 
@@ -54,10 +54,8 @@ public class FileService {
 
   public static void sendList(ChannelHandlerContext ctx, String path) {
     Path fullPath = Paths.get("server_repository").resolve(path);
-
     try {
       List<FileInfo> list = Files.list(fullPath).map(FileInfo::new).collect(Collectors.toList());
-
       ctx.writeAndFlush(new ListResponse(list, path)).addListener(channelFuture -> {
         if (channelFuture.isSuccess()) {
           log.info(ctx.name() + " List sent: " + fullPath);

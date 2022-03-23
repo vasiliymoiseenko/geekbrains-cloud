@@ -25,6 +25,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -41,6 +42,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import ru.geekbrains.cloud.client.netty.NettyClient;
+import ru.geekbrains.cloud.client.service.FileService;
 import ru.geekbrains.cloud.common.messages.auth.AuthRequest;
 import ru.geekbrains.cloud.common.messages.file.DeleteRequest;
 import ru.geekbrains.cloud.common.messages.file.FileRequest;
@@ -49,32 +51,46 @@ import ru.geekbrains.cloud.common.messages.list.FileInfo.FileType;
 import ru.geekbrains.cloud.common.messages.list.ListRequest;
 import ru.geekbrains.cloud.common.messages.reg.RegRequest;
 import ru.geekbrains.cloud.common.messages.list.FileInfo;
-import ru.geekbrains.cloud.common.service.FileService;
+
 
 @Log4j2
 public class Controller implements Initializable {
 
   NettyClient nettyClient;
 
-  @FXML GridPane authPane;
-  @FXML TextField authLogin;
-  @FXML PasswordField authPassword;
-  @FXML Label authMessage;
+  @FXML
+  GridPane authPane;
+  @FXML
+  TextField authLogin;
+  @FXML
+  PasswordField authPassword;
+  @FXML
+  Label authMessage;
 
-  @FXML GridPane regPane;
-  @FXML TextField regLogin;
-  @FXML PasswordField regPassword;
-  @FXML PasswordField regPasswordRep;
-  @FXML Label regMessage;
+  @FXML
+  GridPane regPane;
+  @FXML
+  TextField regLogin;
+  @FXML
+  PasswordField regPassword;
+  @FXML
+  PasswordField regPasswordRep;
+  @FXML
+  Label regMessage;
 
-  @FXML VBox cloudPane;
-  @FXML TextField pathField;
-  @FXML TableView<FileInfo> filesTable;
+  @FXML
+  VBox cloudPane;
+  @FXML
+  TextField pathField;
+  @FXML
+  TableView<FileInfo> filesTable;
 
   @Getter
   @Setter
   String login;
   private FileChooser fileChooser;
+  private Label statusProgressBar = new Label();
+  private ProgressBar progressBar = new ProgressBar();
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -150,10 +166,6 @@ public class Controller implements Initializable {
   public void exitAction(ActionEvent actionEvent) {
     Platform.exit();
   }
-
- /* public void updateFileListServer() {
-    nettyClient.updateFileList();
-  }*/
 
   public void changeStageToReg() {
     regLogin.clear();
@@ -236,13 +248,14 @@ public class Controller implements Initializable {
     File file = fileChooser.showOpenDialog(ClientApplication.getPrimaryStage());
     if (file != null) {
       log.info("File chosen: " + file.getPath());
-      FileService.sendFile(nettyClient.getChannelFuture().channel(), file, pathField.getText());
+      showProgressBar();
+      FileService.sendFile(nettyClient.getChannelFuture().channel(), file, pathField.getText(), this);
     }
   }
 
   public void downloadAction(ActionEvent event) {
-    if (filesTable.getSelectionModel().getSelectedItem() == null){
-      Alert alert  = new Alert(AlertType.WARNING, "File not selected", ButtonType.OK);
+    if (filesTable.getSelectionModel().getSelectedItem() == null) {
+      Alert alert = new Alert(AlertType.WARNING, "File not selected", ButtonType.OK);
       alert.showAndWait();
       return;
     }
@@ -250,8 +263,9 @@ public class Controller implements Initializable {
     String fileName = filesTable.getSelectionModel().getSelectedItem().getFileName();
     String path = pathField.getText();
 
+    showProgressBar();
     nettyClient.send(new FileRequest(fileName, path));
-    log.info("FileRequest sent: " + Paths.get(path,fileName));
+    log.info("FileRequest sent: " + Paths.get(path, fileName));
   }
 
   public void updatePathField(String path) {
@@ -259,8 +273,8 @@ public class Controller implements Initializable {
   }
 
   public void deleteAction(ActionEvent event) {
-    if (filesTable.getSelectionModel().getSelectedItem() == null){
-      Alert alert  = new Alert(AlertType.WARNING, "File not selected", ButtonType.OK);
+    if (filesTable.getSelectionModel().getSelectedItem() == null) {
+      Alert alert = new Alert(AlertType.WARNING, "File not selected", ButtonType.OK);
       alert.showAndWait();
       return;
     }
@@ -269,18 +283,18 @@ public class Controller implements Initializable {
     String path = pathField.getText();
 
     nettyClient.send(new DeleteRequest(fileName, path));
-    log.info("DeleteRequest sent: " + Paths.get(path,fileName));
+    log.info("DeleteRequest sent: " + Paths.get(path, fileName));
   }
 
   public void makeDirectory(ActionEvent event) {
     Label secondLabel = new Label("Enter directory name:");
-    
+
     TextField textField = new TextField();
     textField.setPrefWidth(150);
-    
+
     Button btnCreate = new Button("Create");
     Button btnCancel = new Button("Cancel");
-    
+
     HBox hBox = new HBox();
     hBox.setAlignment(Pos.CENTER);
     hBox.setSpacing(20);
@@ -294,14 +308,11 @@ public class Controller implements Initializable {
 
     Scene secondScene = new Scene(vBox, 250, 100);
 
-    // New window (Stage)
     Stage newWindow = new Stage();
     newWindow.setTitle("Second Stage");
     newWindow.setScene(secondScene);
-
-    // Set position of second window, related to primary window.
-    newWindow.setX(ClientApplication.getPrimaryStage().getX());
-    newWindow.setY(ClientApplication.getPrimaryStage().getY());
+    newWindow.setX(ClientApplication.getPrimaryStage().getX() + 200);
+    newWindow.setY(ClientApplication.getPrimaryStage().getY() + 200);
 
     newWindow.show();
 
@@ -333,5 +344,45 @@ public class Controller implements Initializable {
     if (!path.equals(login)) {
       nettyClient.send(new ListRequest(Paths.get(path).getParent().toString()));
     }
+  }
+
+  public void showProgressBar() {
+    progressBar.setProgress(0);
+    progressBar.setPrefSize(200, 25);
+
+    Button btnOk = new Button("Ok");
+    btnOk.setPadding(new Insets(10, 20, 10, 20));
+
+    VBox vBox = new VBox();
+    vBox.setSpacing(20);
+    vBox.setPadding(new Insets(20));
+    vBox.setAlignment(Pos.CENTER);
+    vBox.getChildren().addAll(statusProgressBar, progressBar, btnOk);
+
+    Scene secondScene = new Scene(vBox, 300, 150);
+
+    Stage newWindow = new Stage();
+    newWindow.setTitle("Progress bar");
+    newWindow.setScene(secondScene);
+    newWindow.setX(ClientApplication.getPrimaryStage().getX() + 200);
+    newWindow.setY(ClientApplication.getPrimaryStage().getY() + 200);
+
+    newWindow.show();
+
+    btnOk.setOnAction(new EventHandler<ActionEvent>() {
+
+      @Override
+      public void handle(ActionEvent event) {
+        newWindow.close();
+      }
+    });
+  }
+
+  public void changeProgressBar(double progress) {
+    progressBar.setProgress(progress);
+  }
+
+  public void setStatusProgressBar(String status) {
+    statusProgressBar.setText(status);
   }
 }

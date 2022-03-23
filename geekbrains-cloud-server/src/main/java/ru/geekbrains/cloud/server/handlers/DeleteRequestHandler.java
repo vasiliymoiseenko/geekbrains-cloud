@@ -5,7 +5,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import ru.geekbrains.cloud.common.messages.file.DeleteRequest;
-import ru.geekbrains.cloud.common.service.FileService;
+import ru.geekbrains.cloud.server.service.FileService;
 
 public class DeleteRequestHandler implements ServerRequestHandler{
 
