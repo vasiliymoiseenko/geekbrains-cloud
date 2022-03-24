@@ -29,17 +29,21 @@ public class Upload {
 
     if (file != null) {
       List<FileInfo> list = filesTable.getItems();
-      for (FileInfo fi: list) {
+      for (FileInfo fi : list) {
         if (file.getName().equals(fi.getFileName())) {
           Alert alert = new Alert(AlertType.CONFIRMATION, "File already exists, overwrite?");
           Optional<ButtonType> option = alert.showAndWait();
-          if (option.get() == ButtonType.OK) {
-            log.info("File chosen: " + file.getPath());
-            controller.showProgressBar();
-            FileService.sendFile(nettyClient.getChannelFuture().channel(), file, pathField.getText(), controller);
-            return;
-          } if (option.get() == ButtonType.CANCEL) {
-            return;
+
+          if (option.isPresent()) {
+            if (option.get() == ButtonType.OK) {
+              log.info("File chosen: " + file.getPath());
+              controller.showProgressBar();
+              FileService.sendFile(nettyClient.getChannelFuture().channel(), file, pathField.getText(), controller);
+              return;
+            }
+            if (option.get() == ButtonType.CANCEL) {
+              return;
+            }
           }
         }
       }
