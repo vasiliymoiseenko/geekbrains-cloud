@@ -1,156 +1,232 @@
 package ru.geekbrains.cloud.client.javafx;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.CountDownLatch;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import ru.geekbrains.cloud.client.netty.Network;
-import ru.geekbrains.cloud.common.service.FileService;
+import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
+import ru.geekbrains.cloud.client.javafx.actions.CreateTableView;
+import ru.geekbrains.cloud.client.javafx.actions.Delete;
+import ru.geekbrains.cloud.client.javafx.actions.Download;
+import ru.geekbrains.cloud.client.javafx.actions.MakeDirectory;
+import ru.geekbrains.cloud.client.javafx.actions.ShowProgressBar;
+import ru.geekbrains.cloud.client.javafx.actions.Upload;
+import ru.geekbrains.cloud.client.netty.NettyClient;
+import ru.geekbrains.cloud.common.constants.Const;
+import ru.geekbrains.cloud.common.messages.auth.AuthRequest;
+import ru.geekbrains.cloud.common.messages.list.FileInfo.FileType;
+import ru.geekbrains.cloud.common.messages.list.ListRequest;
+import ru.geekbrains.cloud.common.messages.reg.RegRequest;
+import ru.geekbrains.cloud.common.messages.list.FileInfo;
 
+@Log4j2
 public class Controller implements Initializable {
 
   @FXML
-  VBox clientPanel;
+  GridPane authPane;
   @FXML
-  VBox serverPanel;
+  TextField authLogin;
+  @FXML
+  PasswordField authPassword;
+  @FXML
+  Label authMessage;
 
-  PanelController leftPC;
-  PanelController rightPC;
-  Network network;
+  @FXML
+  GridPane regPane;
+  @FXML
+  TextField regLogin;
+  @FXML
+  PasswordField regPassword;
+  @FXML
+  PasswordField regPasswordRep;
+  @FXML
+  Label regMessage;
 
+  @FXML
+  VBox cloudPane;
+  @FXML
+  @Getter
+  TextField pathField;
+  @FXML
+  @Getter
+  TableView<FileInfo> filesTable;
 
-  public PanelController getRightPC() {
-    return rightPC;
-  }
-
-  public PanelController getLeftPC() {
-    return leftPC;
-  }
+  @Getter
+  @Setter
+  String login;
+  @Getter
+  private final FileChooser fileChooser = new FileChooser();
+  @Getter
+  private final Label statusProgressBar = new Label();
+  @Getter
+  private final ProgressBar progressBar = new ProgressBar();
+  @Getter
+  private NettyClient nettyClient;
 
   @Override
-  public void initialize(URL location, ResourceBundle resources){
+  public void initialize(URL location, ResourceBundle resources) {
     createRepositoryFolder();
-    network = new Network(this);
+    changeStageToAuth();
+    CreateTableView.action(this);
 
-    leftPC = (PanelController) clientPanel.getProperties().get("ctrl");
-    rightPC = (PanelController) serverPanel.getProperties().get("ctrl");
+    filesTable.setOnMouseClicked(event -> {
+      if (event.getClickCount() == 2) {
+        String fileName = filesTable.getSelectionModel().getSelectedItem().getFileName();
+        String path = pathField.getText();
+        if (filesTable.getSelectionModel().getSelectedItem().getType() == FileType.DIRECTORY) {
+          nettyClient.send(new ListRequest(Paths.get(path, fileName).toString()));
+        }
+      }
+    });
+  }
 
-    leftPC.updateList(Paths.get("client_repository"));
+  public void enterCloud() throws InterruptedException {
+    connection();
+
+    if (authLogin.getText().isEmpty() || authPassword.getText().isEmpty()) {
+      authMessage.setText("Enter login and password");
+      authMessage.setVisible(true);
+    } else {
+      log.info("Trying to log in: " + authLogin.getText());
+      nettyClient.send(new AuthRequest(authLogin.getText(), authPassword.getText()));
+    }
+  }
+
+  public void register() throws InterruptedException {
+    connection();
+
+    if (regLogin.getText().isEmpty() || regPassword.getText().isEmpty() || regPasswordRep.getText().isEmpty()) {
+      regMessage.setTextFill(Color.RED);
+      regMessage.setText("Enter login, password and name");
+      regMessage.setVisible(true);
+    } else if (!regPassword.getText().equals(regPasswordRep.getText())) {
+      regMessage.setTextFill(Color.RED);
+      regMessage.setText("Passwords do not match");
+      regMessage.setVisible(true);
+    } else {
+      log.info("Trying to register a new user: " + regLogin.getText());
+      nettyClient.send(new RegRequest(regLogin.getText(), regPassword.getText(), 2));
+    }
+  }
+
+  public void changeStageToReg() {
+    regLogin.clear();
+    regPassword.clear();
+    regPasswordRep.clear();
+    regMessage.setVisible(false);
+
+    authPane.setVisible(false);
+    regPane.setVisible(true);
+    cloudPane.setVisible(false);
+  }
+
+  public void changeStageToAuth() {
+    authLogin.clear();
+    authPassword.clear();
+    authMessage.setVisible(false);
+
+    authPane.setVisible(true);
+    regPane.setVisible(false);
+    cloudPane.setVisible(false);
+  }
+
+  public void changeStageToCloud() {
+    authPane.setVisible(false);
+    regPane.setVisible(false);
+    cloudPane.setVisible(true);
+
+    nettyClient.send(new ListRequest(login));
+  }
+
+  public void showRegMessage(String reason, Color color) {
+    regMessage.setTextFill(color);
+    regMessage.setText(reason);
+    regMessage.setVisible(true);
+  }
+
+  public void showAuthMessage(String reason, Color color) {
+    authMessage.setTextFill(color);
+    authMessage.setText(reason);
+    authMessage.setVisible(true);
+  }
+
+  public void updateList(List<FileInfo> list) {
+    filesTable.getItems().clear();
+    filesTable.getItems().addAll(list);
+    filesTable.sort();
+  }
+
+  public void pathUpAction() {
+    String path = pathField.getText();
+    if (!path.equals(login)) {
+      nettyClient.send(new ListRequest(Paths.get(path).getParent().toString()));
+    }
+  }
+
+  public void exitAction() {
+    Platform.exit();
+  }
+
+  public void uploadAction() {
+    Upload.action(this);
+  }
+
+  public void downloadAction() {
+    Download.action(this);
+  }
+
+  public void updatePathField(String path) {
+    pathField.setText(path);
+  }
+
+  public void deleteAction() {
+    Delete.action(this);
+  }
+
+  public void makeDirectory() {
+    MakeDirectory.action(this);
+  }
+
+  public void showProgressBar() {
+    ShowProgressBar.action(this);
+  }
+
+  public void changeProgressBar(double progress) {
+    progressBar.setProgress(progress);
+  }
+
+  public void setStatusProgressBar(String status) {
+    statusProgressBar.setText(status);
   }
 
   private void createRepositoryFolder() {
-    File folder = new File("client_repository");
+    File folder = new File(Const.CLIENT_REP);
     if (!folder.exists()) {
       folder.mkdir();
       System.out.println("Folder " + folder.getName() + " created");
     }
   }
 
-  public void exitAction(ActionEvent actionEvent) {
-    Platform.exit();
-  }
-
-  public void copyAction(ActionEvent actionEvent) {
-
-    if (leftPC.getSelectedFileName() == null && rightPC.getSelectedFileName() == null) {
-      Alert alert  = new Alert(AlertType.WARNING, "Ни один файл не выбран", ButtonType.OK);
-      alert.showAndWait();
-      return;
-    }
-
-    PanelController srcPC, dstPC = null;
-    if (leftPC.getSelectedFileName() != null) {
-      srcPC = leftPC;
-      dstPC = rightPC;
-    } else {
-      srcPC = rightPC;
-      dstPC = leftPC;
-    }
-
-    Path srcPath = Paths.get(srcPC.getCurrentPath(), srcPC.getSelectedFileName());
-    Path dstPath = Paths.get(dstPC.getCurrentPath()).resolve(srcPC.getSelectedFileName());
-
-    try {
-      Files.copy(srcPath, dstPath, StandardCopyOption.REPLACE_EXISTING);
-      dstPC.updateList();
-    } catch (IOException e) {
-      Alert alert  = new Alert(AlertType.WARNING, "Не удалось скопировать файл", ButtonType.OK);
-      alert.showAndWait();
-    }
-  }
-
-  public void deleteAction(ActionEvent actionEvent) {
-    PanelController leftPC = (PanelController) clientPanel.getProperties().get("ctrl");
-
-    if (leftPC.getSelectedFileName() == null) {
-      Alert alert  = new Alert(AlertType.WARNING, "Ни один файл не выбран", ButtonType.OK);
-      alert.showAndWait();
-      return;
-    }
-
-    Path srcPath = Paths.get(leftPC.getCurrentPath(), leftPC.getSelectedFileName());
-
-    try {
-      Files.deleteIfExists(srcPath);
-      leftPC.updateList();
-    } catch (IOException e) {
-      Alert alert  = new Alert(AlertType.WARNING, "Не удалось удалить файл", ButtonType.OK);
-      alert.showAndWait();
-    }
-  }
-
-
-  public void updateFileListServer() {
-    network.updateFileList();
-  }
-
-  public void uploadAction(ActionEvent actionEvent) throws IOException{
-    if (leftPC.getSelectedFileName() == null) {
-      Alert alert  = new Alert(AlertType.WARNING, "Файл не выбран", ButtonType.OK);
-      alert.showAndWait();
-      return;
-    }
-
-    Path path = Paths.get(leftPC.getCurrentPath()).resolve(leftPC.getSelectedFileName());
-    System.out.println(path);
-    FileService.sendFile(path, network.getChannel(), future -> {
-      //Alert alert = new Alert(AlertType.INFORMATION, "Файл загружается. Это займет какое-то время", ButtonType.OK);
-      //alert.showAndWait();
-      if (!future.isSuccess()) {
-        future.cause().printStackTrace();
-      }
-      if (future.isSuccess()) {
-        //alert.close();
-        System.out.println("Файл успешно передан");
-      }
-    });
-  }
-
-  public void downloadAction(ActionEvent actionEvent) {
-    if (rightPC.getSelectedFileName() == null){
-      Alert alert  = new Alert(AlertType.WARNING, "Файл не выбран", ButtonType.OK);
-      alert.showAndWait();
-      return;
-    }
-
-    String fileName = rightPC.getSelectedFileName();
-
-    network.sendDownloadRequest(fileName);
-  }
-
-  public void updateFileListClient(ActionEvent actionEvent) {
-    leftPC.updateList();
+  private void connection() throws InterruptedException {
+    CountDownLatch countDownLatch = new CountDownLatch(1);
+    nettyClient = new NettyClient(this, countDownLatch);
+    new Thread(nettyClient).start();
+    countDownLatch.await();
   }
 }

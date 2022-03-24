@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.geekbrains.cloud.client.javafx.Controller">
+  <VBox fx:id="cloudPane" alignment="CENTER" visible="false">
+
+    <HBox>
+      <TextField fx:id="pathField" editable="FALSE" HBox.hgrow="ALWAYS"/>
+      <Button text="Path up" onAction="#pathUpAction"/>
+    </HBox>
+    <TableView fx:id="filesTable" VBox.vgrow="ALWAYS"/>
+
+    <HBox spacing="5">
+      <Button text="Upload" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#uploadAction"/>
+      <Button text="Download" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#downloadAction"/>
+      <Button text="Delete" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#deleteAction"/>
+      <Button text="Make directory" focusTraversable="false" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#makeDirectory"/>
+
+      <padding>
+        <Insets bottom="5" left="5" right="5" top="5"/>
+      </padding>
+    </HBox>
+  </VBox>
+  <GridPane fx:id="authPane" prefHeight="596.0" prefWidth="1039.0" visible="false">
+    <columnConstraints>
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+      <ColumnConstraints hgrow="NEVER" minWidth="10.0" prefWidth="250.0"/>
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+    </columnConstraints>
+    <rowConstraints>
+      <RowConstraints minHeight="10.0" prefHeight="100.0" vgrow="NEVER"/>
+      <RowConstraints minHeight="10.0" prefHeight="35.0" vgrow="NEVER"/>
+      <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="NEVER"/>
+      <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="NEVER"/>
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+      <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="NEVER"/>
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+      <RowConstraints minHeight="10.0" prefHeight="75.0" vgrow="NEVER"/>
+      <RowConstraints minHeight="10.0" prefHeight="20.0" vgrow="NEVER"/>
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS"/>
+    </rowConstraints>
+    <TextField fx:id="authLogin" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0"
+      prefWidth="240.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER"/>
+    <PasswordField fx:id="authPassword" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      onAction="#enterCloud" prefHeight="25.0" prefWidth="240.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="6"
+      GridPane.valignment="CENTER"/>
+    <Label text="Login:" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
+      <font>
+        <Font name="Ubuntu" size="15.0"/>
+      </font>
+      <padding>
+        <Insets right="10.0"/>
+      </padding>
+    </Label>
+    <Label text="Password:" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
+      <font>
+        <Font name="Ubuntu" size="15.0"/>
+      </font>
+      <padding>
+        <Insets right="10.0"/>
+      </padding>
+    </Label>
+    <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#enterCloud"
+      prefHeight="40.0" prefWidth="120.0" text="Enter" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="7"
+      GridPane.valignment="CENTER">
+      <font>
+        <Font name="Ubuntu" size="15.0"/>
+      </font>
+      <GridPane.margin>
+        <Insets/>
+      </GridPane.margin>
+    </Button>
+    <Label text="GeekBrains Cloud" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
+      <font>
+        <Font name="Ubuntu Bold" size="25.0"/>
+      </font>
+    </Label>
+    <Label fx:id="authMessage" text="Account is already online" textAlignment="CENTER" textFill="RED" visible="false" GridPane.columnIndex="1"
+      GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+      <font>
+        <Font name="Ubuntu" size="15.0"/>
+      </font>
+    </Label>
+    <Hyperlink onAction="#changeStageToReg" style="-fx-underline: false;" text="Don't have an accaunt?" GridPane.columnIndex="1"
+      GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="CENTER">
+      <font>
+        <Font name="Ubuntu" size="13.0"/>
+      </font>
+    </Hyperlink>
+    <Label text="Authorization" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+      <font>
+        <Font name="Ubuntu" size="15.0"/>
+      </font>
+    </Label>
+  </GridPane>
+  <GridPane fx:id="regPane" prefHeight="596.0" prefWidth="1039.0">
+    <columnConstraints>
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+      <ColumnConstraints hgrow="NEVER" minWidth="10.0" prefWidth="250.0"/>
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+    </columnConstraints>
+    <rowConstraints>
+      <RowConstraints minHeight="10.0" prefHeight="100.0" vgrow="NEVER"/>
+      <RowConstraints minHeight="10.0" prefHeight="35.0" vgrow="NEVER"/>
+      <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="NEVER"/>
+      <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="NEVER"/>
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+      <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="NEVER"/>
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+      <RowConstraints minHeight="10.0" prefHeight="10.0"/>
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+      <RowConstraints minHeight="10.0" prefHeight="75.0" vgrow="NEVER"/>
+      <RowConstraints minHeight="10.0" prefHeight="20.0" vgrow="NEVER"/>
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+    </rowConstraints>
+    <TextField fx:id="regLogin" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0"
+      prefWidth="240.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER"/>
+    <PasswordField fx:id="regPassword" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0"
+      prefWidth="240.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.valignment="CENTER"/>
+    <PasswordField fx:id="regPasswordRep" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0"
+      prefWidth="240.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="CENTER"/>
+    <Label text="Login:" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
+      <font>
+        <Font name="Ubuntu" size="15.0"/>
+      </font>
+      <padding>
+        <Insets right="10.0"/>
+      </padding>
+    </Label>
+    <Label text="Password:" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
+      <font>
+        <Font name="Ubuntu" size="15.0"/>
+      </font>
+      <padding>
+        <Insets right="10.0"/>
+      </padding>
+    </Label>
+    <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#register"
+      prefHeight="40.0" prefWidth="120.0" text="Register" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="9"
+      GridPane.valignment="CENTER">
+      <font>
+        <Font size="15.0"/>
+      </font>
+      <GridPane.margin>
+        <Insets/>
+      </GridPane.margin>
+    </Button>
+    <Label text="GeekBrains Cloud" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
+      <font>
+        <Font name="Ubuntu Bold" size="25.0"/>
+      </font>
+    </Label>
+    <Label fx:id="regMessage" text="Login is already in use" textAlignment="CENTER" textFill="RED" visible="false" GridPane.columnIndex="1"
+      GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+      <font>
+        <Font name="Ubuntu" size="15.0"/>
+      </font>
+    </Label>
+    <Hyperlink onAction="#changeStageToAuth" prefHeight="23.0" prefWidth="219.0" style="-fx-underline: false;"
+      text="Already have an accaunt? Sign in." GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="10"
+      GridPane.valignment="TOP">
+      <font>
+        <Font name="Ubuntu" size="13.0"/>
+      </font>
+    </Hyperlink>
+    <Label text="Registration" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+      <font>
+        <Font name="Ubuntu" size="15.0"/>
+      </font>
+    </Label>
+    <Label text="Repeat password:" GridPane.halignment="RIGHT" GridPane.rowIndex="8" GridPane.valignment="CENTER">
+      <font>
+        <Font name="Ubuntu" size="15.0"/>
+      </font>
+      <padding>
+        <Insets right="10.0"/>
+      </padding>
+    </Label>
+  </GridPane>
+</StackPane>

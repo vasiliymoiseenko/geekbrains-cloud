@@ -5,13 +5,19 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import lombok.Getter;
 
 public class ClientApplication extends Application {
 
+  @Getter
+  private static Stage primaryStage;
+
   @Override
   public void start(Stage stage) throws IOException {
-    FXMLLoader fxmlLoader = new FXMLLoader(ClientApplication.class.getResource("/views/file-manager-view.fxml"));
-    Scene scene = new Scene(fxmlLoader.load(), 1080, 720);
+    primaryStage = stage;
+
+    FXMLLoader fxmlLoader = new FXMLLoader(ClientApplication.class.getResource("/views/client-view.fxml"));
+    Scene scene = new Scene(fxmlLoader.load(), 720, 480);
     stage.setTitle("GeekBrains Cloud!");
     stage.setScene(scene);
     stage.show();
