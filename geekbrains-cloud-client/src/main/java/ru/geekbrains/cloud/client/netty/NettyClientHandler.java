@@ -8,20 +8,20 @@ import ru.geekbrains.cloud.client.javafx.Controller;
 
 public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
-  private Controller controller;
+  private final Controller controller;
 
   public NettyClientHandler(Controller controller) {
     this.controller = controller;
   }
 
   @Override
-  public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+  public void channelRead(ChannelHandlerContext ctx, Object msg) {
     ClientRequestHandler handler = ClientHandlerRegistry.getHandler(msg.getClass());
     handler.handle(ctx, msg, controller);
   }
 
   @Override
-  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
     cause.printStackTrace();
     ctx.close();
   }

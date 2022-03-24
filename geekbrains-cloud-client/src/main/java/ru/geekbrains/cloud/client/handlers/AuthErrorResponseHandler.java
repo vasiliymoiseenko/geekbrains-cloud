@@ -8,7 +8,7 @@ import ru.geekbrains.cloud.client.javafx.Controller;
 import ru.geekbrains.cloud.common.messages.auth.AuthErrorResponse;
 
 @Log4j2
-public class AuthErrorResponseHandler implements ClientRequestHandler{
+public class AuthErrorResponseHandler implements ClientRequestHandler {
 
   @Override
   public void handle(ChannelHandlerContext ctx, Object msg, Controller controller) {

@@ -30,7 +30,7 @@ public class AuthService {
     private int capacity;
   }
 
-  private HashMap<String, Entry> entries = new HashMap<>();
+  private final HashMap<String, Entry> entries = new HashMap<>();
 
   public void insertUser(String login, String password, int capacity) throws SQLException {
     try (PreparedStatement ps = connection.prepareStatement("INSERT INTO users (login, password, capacity) VALUES (?, ?, ?)")) {

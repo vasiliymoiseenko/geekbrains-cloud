@@ -23,8 +23,8 @@ public class NettyClient implements Runnable{
   @Getter
   private ChannelFuture channelFuture;
 
-  private Controller controller;
-  private CountDownLatch countDownLatch;
+  private final Controller controller;
+  private final CountDownLatch countDownLatch;
 
   public NettyClient(Controller controller, CountDownLatch countDownLatch) {
     this.controller = controller;
@@ -41,7 +41,7 @@ public class NettyClient implements Runnable{
           .channel(NioSocketChannel.class)
           .handler(new ChannelInitializer<SocketChannel>() {
             @Override
-            protected void initChannel(SocketChannel socketChannel) throws Exception {
+            protected void initChannel(SocketChannel socketChannel) {
               socketChannel.pipeline().addLast(
                   new ObjectDecoder(Const.MAXIMUM_OBJECT_SIZE, ClassResolvers.cacheDisabled(null)),
                   new ObjectEncoder(),

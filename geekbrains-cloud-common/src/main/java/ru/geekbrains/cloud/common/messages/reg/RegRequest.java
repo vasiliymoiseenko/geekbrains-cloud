@@ -1,12 +1,13 @@
 package ru.geekbrains.cloud.common.messages.reg;
 
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 import ru.geekbrains.cloud.common.messages.abs.AbstractMessage;
 
 @Value
 public class RegRequest extends AbstractMessage {
 
-  private String login;
-  private String password;
-  private int capacity;
+  String login;
+  String password;
+  int capacity;
 }

@@ -6,8 +6,6 @@ import lombok.extern.log4j.Log4j2;
 import ru.geekbrains.cloud.common.messages.auth.AuthErrorResponse;
 import ru.geekbrains.cloud.common.messages.auth.AuthRequest;
 import ru.geekbrains.cloud.common.messages.auth.AuthSuccessResponse;
-import ru.geekbrains.cloud.common.messages.list.ListResponse;
-import ru.geekbrains.cloud.common.messages.reg.RegRequest;
 import ru.geekbrains.cloud.server.db.AuthService;
 
 @Log4j2
@@ -26,7 +24,7 @@ public class AuthHandler implements ServerRequestHandler {
     if (authService.authUser(login, password)) {
       ctx.writeAndFlush(new AuthSuccessResponse(login)).addListener(channelFuture -> {
         if (channelFuture.isSuccess()) {
-          log.info(ctx.name() + "- AuthSuccesResponse sended: " + login);
+          log.info(ctx.name() + "- AuthSuccessResponse sent: " + login);
         }
       });
     } else {
@@ -34,7 +32,7 @@ public class AuthHandler implements ServerRequestHandler {
 
       ctx.writeAndFlush(new AuthErrorResponse(reason)).addListener(channelFuture -> {
         if (channelFuture.isSuccess()) {
-          log.info(ctx.name() + "- AuthErrorResponse sended: " + reason);
+          log.info(ctx.name() + "- AuthErrorResponse sent: " + reason);
         }
       });
     }

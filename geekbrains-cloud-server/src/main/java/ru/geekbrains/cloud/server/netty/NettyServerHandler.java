@@ -10,18 +10,18 @@ import ru.geekbrains.cloud.server.handlers.ServerRequestHandler;
 public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
   @Override
-  public void channelActive(ChannelHandlerContext ctx) throws Exception {
+  public void channelActive(ChannelHandlerContext ctx) {
     log.info("Client connected: " + ctx.name());
   }
 
   @Override
-  public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+  public void channelRead(ChannelHandlerContext ctx, Object msg) {
     ServerRequestHandler handler = ServerHandlerRegistry.getHandler(msg.getClass());
     handler.handle(ctx, msg);
   }
 
   @Override
-  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
     cause.printStackTrace();
     ctx.close();
   }

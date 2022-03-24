@@ -2,7 +2,6 @@ package ru.geekbrains.cloud.server.netty;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -11,7 +10,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
-import java.util.HashMap;
 import lombok.extern.log4j.Log4j2;
 import ru.geekbrains.cloud.common.constants.Const;
 import ru.geekbrains.cloud.server.db.AuthService;
@@ -19,9 +17,7 @@ import ru.geekbrains.cloud.server.db.AuthService;
 @Log4j2
 public class NettyServer {
 
-  private static AuthService authService = new AuthService();
-  private static HashMap<ChannelHandlerContext, String> users = new HashMap<>();
-
+  private static final AuthService authService = new AuthService();
   private ChannelFuture channelFuture;
 
   public static AuthService getAuthService() {
@@ -41,7 +37,7 @@ public class NettyServer {
           .channel(NioServerSocketChannel.class)
           .childHandler(new ChannelInitializer<SocketChannel>() {
             @Override
-            protected void initChannel(SocketChannel socketChannel) throws Exception {
+            protected void initChannel(SocketChannel socketChannel) {
               socketChannel.pipeline().addLast(
                   new ObjectDecoder(Const.MAXIMUM_OBJECT_SIZE, ClassResolvers.cacheDisabled(null)),
                   new ObjectEncoder(),

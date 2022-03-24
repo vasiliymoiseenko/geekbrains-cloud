@@ -3,9 +3,7 @@ package ru.geekbrains.cloud.server.handlers;
 import io.netty.channel.ChannelHandlerContext;
 import java.sql.SQLException;
 import lombok.AllArgsConstructor;
-import lombok.Value;
 import lombok.extern.log4j.Log4j2;
-import ru.geekbrains.cloud.common.messages.list.ListResponse;
 import ru.geekbrains.cloud.common.messages.reg.RegErrorResponse;
 import ru.geekbrains.cloud.common.messages.reg.RegRequest;
 import ru.geekbrains.cloud.common.messages.reg.RegSuccessResponse;
@@ -30,7 +28,7 @@ public class RegHandler implements ServerRequestHandler {
 
       ctx.writeAndFlush(new RegSuccessResponse()).addListener(channelFuture -> {
         if (channelFuture.isSuccess()) {
-          log.info(ctx.name() + "- RegSuccessResponse sended: User " + regRequest.getLogin() + " registered");
+          log.info(ctx.name() + "- RegSuccessResponse sent: User " + regRequest.getLogin() + " registered");
         }
       });
     } catch (SQLException e) {
@@ -44,7 +42,7 @@ public class RegHandler implements ServerRequestHandler {
 
       ctx.writeAndFlush(new RegErrorResponse(reason)).addListener(channelFuture -> {
         if (channelFuture.isSuccess()) {
-          log.info(ctx.name() + " RegErrorResponse sended: " + reason);
+          log.info(ctx.name() + " RegErrorResponse sent: " + reason);
         }
       });
     }

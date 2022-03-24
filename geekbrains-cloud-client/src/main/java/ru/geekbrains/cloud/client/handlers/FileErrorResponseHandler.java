@@ -19,7 +19,6 @@ public class FileErrorResponseHandler implements ClientRequestHandler{
     Platform.runLater(() -> {
       Alert alert = new Alert(AlertType.WARNING, reason, ButtonType.OK);
       alert.showAndWait();
-      return;
     });
   }
 }

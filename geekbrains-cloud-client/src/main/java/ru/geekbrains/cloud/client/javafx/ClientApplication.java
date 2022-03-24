@@ -17,7 +17,7 @@ public class ClientApplication extends Application {
     primaryStage = stage;
 
     FXMLLoader fxmlLoader = new FXMLLoader(ClientApplication.class.getResource("/views/client-view.fxml"));
-    Scene scene = new Scene(fxmlLoader.load(), 1080, 720);
+    Scene scene = new Scene(fxmlLoader.load(), 720, 480);
     stage.setTitle("GeekBrains Cloud!");
     stage.setScene(scene);
     stage.show();
