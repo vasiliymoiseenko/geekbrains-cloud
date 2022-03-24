@@ -14,12 +14,11 @@ import java.util.concurrent.CountDownLatch;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import ru.geekbrains.cloud.client.javafx.Controller;
+import ru.geekbrains.cloud.common.constants.Const;
 import ru.geekbrains.cloud.common.messages.abs.AbstractMessage;
 
 @Log4j2
 public class NettyClient implements Runnable{
-
-  private static final int MAXIMUM_OBJECT_SIZE = 1024 * 1024 * 10;
 
   @Getter
   private ChannelFuture channelFuture;
@@ -44,12 +43,12 @@ public class NettyClient implements Runnable{
             @Override
             protected void initChannel(SocketChannel socketChannel) throws Exception {
               socketChannel.pipeline().addLast(
-                  new ObjectDecoder(MAXIMUM_OBJECT_SIZE, ClassResolvers.cacheDisabled(null)),
+                  new ObjectDecoder(Const.MAXIMUM_OBJECT_SIZE, ClassResolvers.cacheDisabled(null)),
                   new ObjectEncoder(),
                   new NettyClientHandler(controller));
             }
           });
-      channelFuture = b.connect("localhost", 45001).sync();
+      channelFuture = b.connect(Const.SERVER, Const.PORT).sync();
       countDownLatch.countDown();
       channelFuture.channel().closeFuture().sync();
     } catch (Exception e) {

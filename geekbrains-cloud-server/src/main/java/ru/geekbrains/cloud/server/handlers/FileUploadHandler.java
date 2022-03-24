@@ -3,7 +3,9 @@ package ru.geekbrains.cloud.server.handlers;
 import io.netty.channel.ChannelHandlerContext;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import lombok.extern.log4j.Log4j2;
+import ru.geekbrains.cloud.common.constants.Const;
 import ru.geekbrains.cloud.common.messages.file.FileMessage;
 import ru.geekbrains.cloud.server.service.FileService;
 
@@ -20,7 +22,7 @@ public class FileUploadHandler implements ServerRequestHandler{
     try {
       if (fileMessage.partNumber == 1) {
         append = false;
-        fos = new FileOutputStream("server_repository/" + fileMessage.path + "/" + fileMessage.filename, append);
+        fos = new FileOutputStream(Paths.get(Const.SERVER_REP, fileMessage.path, fileMessage.filename).toString(), append);
       } else {
         append = true;
       }
@@ -31,9 +33,7 @@ public class FileUploadHandler implements ServerRequestHandler{
       if (fileMessage.partNumber == fileMessage.partsCount) {
         fos.close();
         append = false;
-
         log.info(ctx.name() + "File " + fileMessage.filename + " is completely uploaded");
-
         FileService.sendList(ctx, fileMessage.path);
       }
     } catch (IOException e) {

@@ -11,7 +11,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
   @Override
   public void channelActive(ChannelHandlerContext ctx) throws Exception {
-    log.info("Client connected " + ctx.name());
+    log.info("Client connected: " + ctx.name());
   }
 
   @Override

@@ -1,7 +1,6 @@
 package ru.geekbrains.cloud.server.netty;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
@@ -13,16 +12,12 @@ import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 import java.util.HashMap;
-import java.util.Map;
-import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import ru.geekbrains.cloud.common.constants.Const;
 import ru.geekbrains.cloud.server.db.AuthService;
 
 @Log4j2
 public class NettyServer {
-
-  private static final int MAXIMUM_OBJECT_SIZE = 1024 * 1024 * 10;
-
 
   private static AuthService authService = new AuthService();
   private static HashMap<ChannelHandlerContext, String> users = new HashMap<>();
@@ -48,13 +43,13 @@ public class NettyServer {
             @Override
             protected void initChannel(SocketChannel socketChannel) throws Exception {
               socketChannel.pipeline().addLast(
-                  new ObjectDecoder(MAXIMUM_OBJECT_SIZE, ClassResolvers.cacheDisabled(null)),
+                  new ObjectDecoder(Const.MAXIMUM_OBJECT_SIZE, ClassResolvers.cacheDisabled(null)),
                   new ObjectEncoder(),
                   new NettyServerHandler()
               );
             }
           });
-      channelFuture = b.bind(45001).sync();
+      channelFuture = b.bind(Const.PORT).sync();
       channelFuture.channel().closeFuture().sync();
     } finally {
       workerGroup.shutdownGracefully();

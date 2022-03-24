@@ -13,7 +13,9 @@ public class RegErrorResponseHandler implements ClientRequestHandler {
   @Override
   public void handle(ChannelHandlerContext ctx, Object msg, Controller controller) {
     String reason = ((RegErrorResponse) msg).getReason();
+
     log.info("Registrarion failed: " + reason);
+
     Platform.runLater(() -> controller.showRegMessage(reason, Color.RED));
   }
 }

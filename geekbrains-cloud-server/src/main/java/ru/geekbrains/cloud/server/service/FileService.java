@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
+import ru.geekbrains.cloud.common.constants.Const;
 import ru.geekbrains.cloud.common.messages.file.FileMessage;
 import ru.geekbrains.cloud.common.messages.list.FileInfo;
 import ru.geekbrains.cloud.common.messages.list.ListErrorResponse;
@@ -53,7 +54,7 @@ public class FileService {
   }
 
   public static void sendList(ChannelHandlerContext ctx, String path) {
-    Path fullPath = Paths.get("server_repository").resolve(path);
+    Path fullPath = Paths.get(Const.SERVER_REP, path);
     try {
       List<FileInfo> list = Files.list(fullPath).map(FileInfo::new).collect(Collectors.toList());
       ctx.writeAndFlush(new ListResponse(list, path)).addListener(channelFuture -> {

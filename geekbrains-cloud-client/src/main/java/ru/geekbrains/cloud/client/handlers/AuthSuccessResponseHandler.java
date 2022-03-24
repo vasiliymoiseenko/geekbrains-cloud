@@ -17,6 +17,7 @@ public class AuthSuccessResponseHandler implements ClientRequestHandler {
     String login = authSuccessResponse.getLogin();
 
     log.info("Authorization completed successfully");
+
     Platform.runLater(() -> {
       controller.setLogin(login);
       controller.changeStageToCloud();

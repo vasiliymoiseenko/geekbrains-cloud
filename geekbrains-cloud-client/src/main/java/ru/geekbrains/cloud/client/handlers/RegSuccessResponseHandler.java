@@ -12,6 +12,7 @@ public class RegSuccessResponseHandler implements ClientRequestHandler {
   @Override
   public void handle(ChannelHandlerContext ctx, Object msg, Controller controller) {
     log.info("Registration completed successfully");
+
     Platform.runLater(() -> controller.showRegMessage("Registration completed", Color.ROYALBLUE));
   }
 }

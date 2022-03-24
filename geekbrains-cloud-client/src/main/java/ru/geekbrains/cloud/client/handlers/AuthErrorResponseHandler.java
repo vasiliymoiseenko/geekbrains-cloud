@@ -13,7 +13,9 @@ public class AuthErrorResponseHandler implements ClientRequestHandler{
   @Override
   public void handle(ChannelHandlerContext ctx, Object msg, Controller controller) {
     String reason = ((AuthErrorResponse) msg).getReason();
+
     log.info("Authorization failed: " + reason);
+
     Platform.runLater(() -> controller.showAuthMessage(reason, Color.RED));
   }
 }

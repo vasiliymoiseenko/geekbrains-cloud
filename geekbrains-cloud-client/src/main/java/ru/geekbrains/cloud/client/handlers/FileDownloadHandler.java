@@ -3,9 +3,11 @@ package ru.geekbrains.cloud.client.handlers;
 import io.netty.channel.ChannelHandlerContext;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import javafx.application.Platform;
 import lombok.extern.log4j.Log4j2;
 import ru.geekbrains.cloud.client.javafx.Controller;
+import ru.geekbrains.cloud.common.constants.Const;
 import ru.geekbrains.cloud.common.messages.file.FileMessage;
 
 @Log4j2
@@ -21,7 +23,7 @@ public class FileDownloadHandler implements ClientRequestHandler{
     try {
       if (fileMessage.partNumber == 1) {
         append = false;
-        fos = new FileOutputStream("client_repository/" + fileMessage.filename, append);
+        fos = new FileOutputStream(Paths.get(Const.CLIENT_REP, fileMessage.filename).toString(), append);
         Platform.runLater(() -> controller.setStatusProgressBar("Download file: " + fileMessage.filename));
       } else {
         append = true;

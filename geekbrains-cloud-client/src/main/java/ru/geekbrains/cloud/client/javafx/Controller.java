@@ -43,6 +43,7 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import ru.geekbrains.cloud.client.netty.NettyClient;
 import ru.geekbrains.cloud.client.service.FileService;
+import ru.geekbrains.cloud.common.constants.Const;
 import ru.geekbrains.cloud.common.messages.auth.AuthRequest;
 import ru.geekbrains.cloud.common.messages.file.DeleteRequest;
 import ru.geekbrains.cloud.common.messages.file.FileRequest;
@@ -156,7 +157,7 @@ public class Controller implements Initializable {
   }
 
   private void createRepositoryFolder() {
-    File folder = new File("client_repository");
+    File folder = new File(Const.CLIENT_REP);
     if (!folder.exists()) {
       folder.mkdir();
       System.out.println("Folder " + folder.getName() + " created");

@@ -1,6 +1,7 @@
 package ru.geekbrains.cloud.server.db;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -12,6 +13,7 @@ import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
+import ru.geekbrains.cloud.common.constants.Const;
 
 @Log4j2
 public class AuthService {
@@ -39,7 +41,7 @@ public class AuthService {
 
       entries.put(login, new Entry(login, password, capacity));
       log.info("User " + login + " added to users.db");
-      createFolder("server_repository/" + login);
+      createFolder(Paths.get(Const.SERVER_REP, login).toString());
     }
   }
 
@@ -92,10 +94,10 @@ public class AuthService {
   }
 
   private void createFolders() {
-    createFolder("server_repository");
+    createFolder(Const.SERVER_REP);
     for (Map.Entry<String, Entry> entry : entries.entrySet()) {
       String login = entry.getKey();
-      createFolder("server_repository/" + login);
+      createFolder(Paths.get(Const.SERVER_REP, login).toString());
     }
   }
 
