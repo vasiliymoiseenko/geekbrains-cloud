@@ -26,7 +26,7 @@ public class AuthHandler implements ServerRequestHandler {
     if (authService.authUser(login, password)) {
       ctx.writeAndFlush(new AuthSuccessResponse(login)).addListener(channelFuture -> {
         if (channelFuture.isSuccess()) {
-          log.info(ctx.name() + " AuthSuccesResponse sended: " + login);
+          log.info(ctx.name() + "- AuthSuccesResponse sended: " + login);
         }
       });
     } else {
@@ -34,7 +34,7 @@ public class AuthHandler implements ServerRequestHandler {
 
       ctx.writeAndFlush(new AuthErrorResponse(reason)).addListener(channelFuture -> {
         if (channelFuture.isSuccess()) {
-          log.info(ctx.name() + " AuthErrorResponse sended: " + reason);
+          log.info(ctx.name() + "- AuthErrorResponse sended: " + reason);
         }
       });
     }

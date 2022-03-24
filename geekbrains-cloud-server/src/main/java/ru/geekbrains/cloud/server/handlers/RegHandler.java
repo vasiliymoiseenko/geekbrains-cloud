@@ -30,7 +30,7 @@ public class RegHandler implements ServerRequestHandler {
 
       ctx.writeAndFlush(new RegSuccessResponse()).addListener(channelFuture -> {
         if (channelFuture.isSuccess()) {
-          log.info(ctx.name() + " RegSuccessResponse sended: User " + regRequest.getLogin() + " registered");
+          log.info(ctx.name() + "- RegSuccessResponse sended: User " + regRequest.getLogin() + " registered");
         }
       });
     } catch (SQLException e) {

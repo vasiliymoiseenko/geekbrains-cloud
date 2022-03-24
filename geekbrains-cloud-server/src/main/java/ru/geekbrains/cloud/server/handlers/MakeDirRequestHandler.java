@@ -23,7 +23,7 @@ public class MakeDirRequestHandler implements ServerRequestHandler{
     File file = new File(absolutePath.toString());
 
     boolean result = file.mkdir();
-    log.info(ctx.name() + " Make directory " + absolutePath + " result " + result);
+    log.info(ctx.name() + "- Make directory " + absolutePath + " result " + result);
 
     FileService.sendList(ctx, path);
   }

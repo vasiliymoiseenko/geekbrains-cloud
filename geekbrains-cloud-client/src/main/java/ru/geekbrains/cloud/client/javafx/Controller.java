@@ -2,8 +2,6 @@ package ru.geekbrains.cloud.client.javafx;
 
 import java.io.File;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -255,8 +253,16 @@ public class Controller implements Initializable {
   }
 
   public void downloadAction(ActionEvent event) {
-    if (filesTable.getSelectionModel().getSelectedItem() == null) {
+    FileInfo fileInfo = filesTable.getSelectionModel().getSelectedItem();
+
+    if (fileInfo == null) {
       Alert alert = new Alert(AlertType.WARNING, "File not selected", ButtonType.OK);
+      alert.showAndWait();
+      return;
+    }
+
+    if (fileInfo.getType() == FileType.DIRECTORY) {
+      Alert alert = new Alert(AlertType.WARNING, "Directory selected, select file", ButtonType.OK);
       alert.showAndWait();
       return;
     }

@@ -27,13 +27,13 @@ public class FileUploadHandler implements ServerRequestHandler{
         append = true;
       }
 
-      log.info(ctx.name() + " File " + fileMessage.filename + " part " + fileMessage.partNumber + " / " + fileMessage.partsCount + " received");
+      log.info(ctx.name() + ": File " + fileMessage.filename + " part " + fileMessage.partNumber + " / " + fileMessage.partsCount + " received");
       fos.write(fileMessage.data);
 
       if (fileMessage.partNumber == fileMessage.partsCount) {
         fos.close();
         append = false;
-        log.info(ctx.name() + "File " + fileMessage.filename + " is completely uploaded");
+        log.info(ctx.name() + ": File " + fileMessage.filename + " is completely uploaded");
         FileService.sendList(ctx, fileMessage.path);
       }
     } catch (IOException e) {

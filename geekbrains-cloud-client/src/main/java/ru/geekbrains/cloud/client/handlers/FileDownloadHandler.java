@@ -29,7 +29,7 @@ public class FileDownloadHandler implements ClientRequestHandler{
         append = true;
       }
 
-      log.info(ctx.name() + "File " + fileMessage.filename + " part " + fileMessage.partNumber + " / " + fileMessage.partsCount + " received");
+      log.info(ctx.name() + ": File " + fileMessage.filename + " part " + fileMessage.partNumber + " / " + fileMessage.partsCount + " received");
       fos.write(fileMessage.data);
 
       Platform.runLater(() -> controller.changeProgressBar((double) fileMessage.partNumber * ((double) 1 / fileMessage.partsCount)));
@@ -38,7 +38,7 @@ public class FileDownloadHandler implements ClientRequestHandler{
         fos.close();
         append = false;
         Platform.runLater(() -> controller.setStatusProgressBar("File " + fileMessage.filename + " is completely downloaded"));
-        log.info(ctx.name() + "File " + fileMessage.filename + " is completely downloaded");
+        log.info(ctx.name() + ": File " + fileMessage.filename + " is completely downloaded");
       }
     } catch (IOException e) {
       e.printStackTrace();
