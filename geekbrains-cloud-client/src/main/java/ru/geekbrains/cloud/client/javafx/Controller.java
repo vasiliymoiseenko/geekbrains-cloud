@@ -5,6 +5,7 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
 import javafx.application.Platform;
@@ -245,7 +246,25 @@ public class Controller implements Initializable {
 
   public void uploadAction(ActionEvent event) {
     File file = fileChooser.showOpenDialog(ClientApplication.getPrimaryStage());
+
     if (file != null) {
+
+      List<FileInfo> list = filesTable.getItems();
+      for (FileInfo fi: list) {
+        if (file.getName().equals(fi.getFileName())) {
+          Alert alert = new Alert(AlertType.CONFIRMATION, "File already exists, overwrite?");
+          Optional<ButtonType> option = alert.showAndWait();
+          if (option.get() == ButtonType.OK) {
+            log.info("File chosen: " + file.getPath());
+            showProgressBar();
+            FileService.sendFile(nettyClient.getChannelFuture().channel(), file, pathField.getText(), this);
+            return;
+          } if (option.get() == ButtonType.CANCEL) {
+            return;
+          }
+        }
+      }
+
       log.info("File chosen: " + file.getPath());
       showProgressBar();
       FileService.sendFile(nettyClient.getChannelFuture().channel(), file, pathField.getText(), this);
@@ -267,12 +286,28 @@ public class Controller implements Initializable {
       return;
     }
 
-    String fileName = filesTable.getSelectionModel().getSelectedItem().getFileName();
-    String path = pathField.getText();
+    File file = new File(Paths.get(Const.CLIENT_REP, fileInfo.getFileName()).toString());
 
-    showProgressBar();
-    nettyClient.send(new FileRequest(fileName, path));
-    log.info("FileRequest sent: " + Paths.get(path, fileName));
+    if (file.exists()) {
+      Alert alert = new Alert(AlertType.CONFIRMATION, "File already exists, overwrite?");
+      Optional<ButtonType> option = alert.showAndWait();
+
+      if (option.get() == ButtonType.OK) {
+        String fileName = filesTable.getSelectionModel().getSelectedItem().getFileName();
+        String path = pathField.getText();
+
+        showProgressBar();
+        nettyClient.send(new FileRequest(fileName, path));
+        log.info("FileRequest sent: " + Paths.get(path, fileName));
+      }
+    } else {
+      String fileName = filesTable.getSelectionModel().getSelectedItem().getFileName();
+      String path = pathField.getText();
+
+      showProgressBar();
+      nettyClient.send(new FileRequest(fileName, path));
+      log.info("FileRequest sent: " + Paths.get(path, fileName));
+    }
   }
 
   public void updatePathField(String path) {

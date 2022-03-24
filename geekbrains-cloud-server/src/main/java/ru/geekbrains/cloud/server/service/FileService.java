@@ -42,7 +42,6 @@ public class FileService {
           }
           ChannelFuture f = channel.writeAndFlush(fileMessage);
           f.sync();
-          //progress bar
           log.info("File " + fileMessage.filename + " part " + (i + 1) + "/" + partsCount + " sent");
         }
 
@@ -59,14 +58,14 @@ public class FileService {
       List<FileInfo> list = Files.list(fullPath).map(FileInfo::new).collect(Collectors.toList());
       ctx.writeAndFlush(new ListResponse(list, path)).addListener(channelFuture -> {
         if (channelFuture.isSuccess()) {
-          log.info(ctx.name() + " List sent: " + fullPath);
+          log.info(ctx.name() + "- List sent: " + fullPath);
         }
       });
     } catch (IOException e) {
       String reason = e.toString();
       ctx.writeAndFlush(new ListErrorResponse(reason)).addListener(channelFuture -> {
         if (channelFuture.isSuccess()) {
-          log.info(ctx.name() + " ListErrorResponse sent: " + reason);
+          log.info(ctx.name() + "- ListErrorResponse sent: " + reason);
         }
       });
     }
