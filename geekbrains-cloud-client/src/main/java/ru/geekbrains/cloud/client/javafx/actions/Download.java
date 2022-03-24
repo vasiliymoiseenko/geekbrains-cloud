@@ -43,13 +43,15 @@ public class Download {
       Alert alert = new Alert(AlertType.CONFIRMATION, "File already exists, overwrite?");
       Optional<ButtonType> option = alert.showAndWait();
 
-      if (option.get() == ButtonType.OK) {
-        String fileName = filesTable.getSelectionModel().getSelectedItem().getFileName();
-        String path = pathField.getText();
+      if (option.isPresent()) {
+        if (option.get() == ButtonType.OK) {
+          String fileName = filesTable.getSelectionModel().getSelectedItem().getFileName();
+          String path = pathField.getText();
 
-        controller.showProgressBar();
-        nettyClient.send(new FileRequest(fileName, path));
-        log.info("FileRequest sent: " + Paths.get(path, fileName));
+          controller.showProgressBar();
+          nettyClient.send(new FileRequest(fileName, path));
+          log.info("FileRequest sent: " + Paths.get(path, fileName));
+        }
       }
     } else {
       String fileName = filesTable.getSelectionModel().getSelectedItem().getFileName();
