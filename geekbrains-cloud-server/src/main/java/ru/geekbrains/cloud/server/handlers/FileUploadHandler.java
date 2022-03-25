@@ -7,35 +7,31 @@ import java.nio.file.Paths;
 import lombok.extern.log4j.Log4j2;
 import ru.geekbrains.cloud.common.constants.Const;
 import ru.geekbrains.cloud.common.messages.file.FileMessage;
-import ru.geekbrains.cloud.server.service.FileService;
+import ru.geekbrains.cloud.server.service.ClientService;
 
 @Log4j2
-public class FileUploadHandler implements ServerRequestHandler{
-
-  private FileOutputStream fos;
-  private Boolean append;
+public class FileUploadHandler implements ServerRequestHandler {
 
   @Override
-  public void handle(ChannelHandlerContext ctx, Object msg) {
+  public void handle(ChannelHandlerContext ctx, Object msg, ClientService clientService) {
+    if (!clientService.isAuthorized()) {
+      return;
+    }
+
     FileMessage fileMessage = (FileMessage) msg;
 
-    try {
-      if (fileMessage.partNumber == 1) {
-        append = false;
-        fos = new FileOutputStream(Paths.get(Const.SERVER_REP, fileMessage.path, fileMessage.filename).toString(), append);
-      } else {
-        append = true;
-      }
+    boolean append = fileMessage.partNumber != 1;
+
+    try (FileOutputStream fos = new FileOutputStream(Paths.get(Const.SERVER_REP, fileMessage.path, fileMessage.filename).toString(), append)) {
 
       log.info(ctx.name() + ": File " + fileMessage.filename + " part " + fileMessage.partNumber + " / " + fileMessage.partsCount + " received");
       fos.write(fileMessage.data);
 
       if (fileMessage.partNumber == fileMessage.partsCount) {
-        fos.close();
-        append = false;
         log.info(ctx.name() + ": File " + fileMessage.filename + " is completely uploaded");
-        FileService.sendList(ctx, fileMessage.path);
+        clientService.sendList(ctx, fileMessage.path);
       }
+
     } catch (IOException e) {
       e.printStackTrace();
     }

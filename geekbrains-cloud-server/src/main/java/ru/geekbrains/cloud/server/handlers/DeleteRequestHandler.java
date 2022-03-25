@@ -8,13 +8,17 @@ import lombok.extern.log4j.Log4j2;
 import ru.geekbrains.cloud.common.constants.Const;
 import ru.geekbrains.cloud.common.messages.file.DeleteRequest;
 import ru.geekbrains.cloud.common.messages.file.FileErrorResponse;
-import ru.geekbrains.cloud.server.service.FileService;
+import ru.geekbrains.cloud.server.service.ClientService;
 
 @Log4j2
-public class DeleteRequestHandler implements ServerRequestHandler{
+public class DeleteRequestHandler implements ServerRequestHandler {
 
   @Override
-  public void handle(ChannelHandlerContext ctx, Object msg) {
+  public void handle(ChannelHandlerContext ctx, Object msg, ClientService clientService) {
+    if (!clientService.isAuthorized()) {
+      return;
+    }
+
     DeleteRequest deleteRequest = (DeleteRequest) msg;
 
     String fileName = deleteRequest.getFileName();
@@ -25,7 +29,7 @@ public class DeleteRequestHandler implements ServerRequestHandler{
 
     if (file.delete()) {
       log.info(ctx.name() + "- File " + file.getPath() + " deleted");
-      FileService.sendList(ctx, path);
+      clientService.sendList(ctx, path);
     } else {
       String reason;
 

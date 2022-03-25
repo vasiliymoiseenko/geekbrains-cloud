@@ -7,13 +7,17 @@ import java.nio.file.Paths;
 import lombok.extern.log4j.Log4j2;
 import ru.geekbrains.cloud.common.constants.Const;
 import ru.geekbrains.cloud.common.messages.file.MakeDirRequest;
-import ru.geekbrains.cloud.server.service.FileService;
+import ru.geekbrains.cloud.server.service.ClientService;
 
 @Log4j2
-public class MakeDirRequestHandler implements ServerRequestHandler{
+public class MakeDirRequestHandler implements ServerRequestHandler {
 
   @Override
-  public void handle(ChannelHandlerContext ctx, Object msg) {
+  public void handle(ChannelHandlerContext ctx, Object msg, ClientService clientService) {
+    if (!clientService.isAuthorized()) {
+      return;
+    }
+    
     MakeDirRequest makeDirRequest = (MakeDirRequest) msg;
 
     String fileName = makeDirRequest.getFileName();
@@ -25,6 +29,6 @@ public class MakeDirRequestHandler implements ServerRequestHandler{
     boolean result = file.mkdir();
     log.info(ctx.name() + "- Make directory " + absolutePath + " result " + result);
 
-    FileService.sendList(ctx, path);
+    clientService.sendList(ctx, path);
   }
 }

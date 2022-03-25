@@ -8,6 +8,7 @@ import ru.geekbrains.cloud.common.messages.reg.RegErrorResponse;
 import ru.geekbrains.cloud.common.messages.reg.RegRequest;
 import ru.geekbrains.cloud.common.messages.reg.RegSuccessResponse;
 import ru.geekbrains.cloud.server.db.AuthService;
+import ru.geekbrains.cloud.server.service.ClientService;
 
 @Log4j2
 @AllArgsConstructor
@@ -16,7 +17,7 @@ public class RegHandler implements ServerRequestHandler {
   private AuthService authService;
 
   @Override
-  public void handle(ChannelHandlerContext ctx, Object msg) {
+  public void handle(ChannelHandlerContext ctx, Object msg, ClientService clientService) {
     RegRequest regRequest = (RegRequest) msg;
 
     String login = regRequest.getLogin();
